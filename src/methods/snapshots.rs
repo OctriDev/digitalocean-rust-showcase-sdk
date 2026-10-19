@@ -38,6 +38,18 @@ impl<'de> serde::Deserialize<'de> for SnapshotsDelete {
     }
 }
 
+impl ::std::convert::From<i64> for SnapshotsDelete {
+    fn from(value: i64) -> Self {
+        Self::Integer(value)
+    }
+}
+
+impl ::std::convert::From<String> for SnapshotsDelete {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum SnapshotsListEnum {
     #[default]

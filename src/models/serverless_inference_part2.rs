@@ -3,6 +3,15 @@
 
 // serverless_inference domain models (part 2)
 
+/// Response listing available models.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListModelsResponse {
+    /// The object type, which is always "list".
+    pub object: ListModelsResponseObjectEnum,
+    /// The list of available models.
+    pub data: Vec<Model>,
+}
+
 impl ListModelsResponse {
     pub fn new(object: ListModelsResponseObjectEnum, data: Vec<Model>) -> Self {
         Self { object, data }

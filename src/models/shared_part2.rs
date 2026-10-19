@@ -158,6 +158,18 @@ impl<'de> serde::Deserialize<'de> for PageLinksPages {
     }
 }
 
+impl ::std::convert::From<Box<ForwardLinks>> for PageLinksPages {
+    fn from(value: Box<ForwardLinks>) -> Self {
+        Self::ForwardLinks(value)
+    }
+}
+
+impl ::std::convert::From<Box<BackwardLinks>> for PageLinksPages {
+    fn from(value: Box<BackwardLinks>) -> Self {
+        Self::BackwardLinks(value)
+    }
+}
+
 /// Typed representation of the `PageLinks` API schema.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct PageLinks {

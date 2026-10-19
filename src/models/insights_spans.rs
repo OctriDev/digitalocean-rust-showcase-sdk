@@ -327,6 +327,30 @@ impl<'de> serde::Deserialize<'de> for SpansFilterValueVariant4Value {
     }
 }
 
+impl ::std::convert::From<String> for SpansFilterValueVariant4Value {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<f64> for SpansFilterValueVariant4Value {
+    fn from(value: f64) -> Self {
+        Self::Number(value)
+    }
+}
+
+impl ::std::convert::From<bool> for SpansFilterValueVariant4Value {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
+    }
+}
+
+impl ::std::convert::From<Vec<String>> for SpansFilterValueVariant4Value {
+    fn from(value: Vec<String>) -> Self {
+        Self::StringArray(value)
+    }
+}
+
 /// A typed value wrapper.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SpansFilterValueVariant4 {
@@ -444,36 +468,4 @@ pub struct SpansPaginationRequest {
     /// Maximum number of spans to return. Defaults to 100 and must be between 1 and 1000.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-}
-
-impl SpansPaginationRequest {
-    pub(super) fn validate_constraints(&self) -> Result<(), crate::errors::SdkError> {
-        if let Some(value) = self.limit.as_ref() {
-            crate::validation::validate_range(
-                "limit",
-                *value as f64,
-                crate::validation::RangeOpts {
-                    min: Some(1_f64),
-                    max: Some(1000_f64),
-                    ..Default::default()
-                },
-            )?;
-        }
-        Ok(())
-    }
-
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Result<Self, crate::errors::SdkError> {
-        let value = Self { limit: None };
-        value.validate_constraints()?;
-        Ok(value)
-    }
-}
-
-/// Pagination metadata for a spans search response.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct SpansPaginationResponse {
-    /// Whether more spans matched than were returned in this page. Cursor-based continuation is not yet supported.
-    #[serde(rename = "hasMore", skip_serializing_if = "Option::is_none")]
-    pub has_more: Option<bool>,
 }

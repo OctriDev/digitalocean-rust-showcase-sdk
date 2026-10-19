@@ -3,6 +3,88 @@
 
 // serverless_inference_create domain models (part 2)
 
+/// Request body for sending a prompt to a model using the Responses API.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct CreateResponseRequest {
+    /// The model ID of the model you want to use. Get the model ID using `/v1/models` or on the available models page.
+    pub model: String,
+    /// The prompt or input content you want the model to respond to. Can be a simple text string or an array of message objects for conversation context.
+    pub input: CreateResponseRequestInput,
+    /// The maximum number of tokens to generate in the response.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub max_output_tokens: Option<Option<i64>>,
+    /// A value between 0.0 and 2.0 to control randomness and creativity. Lower values like 0.2 make the output more focused and deterministic, while higher values like 0.8 make it more random.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub temperature: Option<Option<f64>>,
+    /// Set to true to stream partial responses as Server-Sent Events.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub stream: Option<Option<bool>>,
+    /// System-level instructions for the model. This sets the behavior and context for the response generation.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub instructions: Option<Option<String>>,
+    /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub top_p: Option<Option<f64>>,
+    /// Options for streaming response. Only set this when you set stream to true.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub stream_options: Option<Option<CreateResponseRequestStreamOptions>>,
+    /// A list of tools the model may call.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub tools: Option<Option<Vec<CreateResponseRequestToolsItem>>>,
+    /// Controls which (if any) tool is called by the model.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tool_choice: Option<CreateResponseRequestToolChoice>,
+    /// Up to 4 sequences where the API will stop generating further tokens.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub stop: Option<Option<CreateResponseRequestStop>>,
+    /// Set of key-value pairs that can be attached to the request.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub metadata: Option<Option<std::collections::HashMap<String, String>>>,
+    /// A unique identifier representing your end-user.
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        default,
+        with = "crate::client::double_option"
+    )]
+    pub user: Option<Option<String>>,
+}
+
 impl CreateResponseRequest {
     pub(super) fn validate_constraints(&self) -> Result<(), crate::errors::SdkError> {
         if let Some(Some(value)) = self.max_output_tokens.as_ref() {
@@ -414,67 +496,4 @@ pub struct CreateResponseResponseOutputItem {
         with = "crate::client::double_option"
     )]
     pub arguments: Option<Option<String>>,
-}
-
-impl CreateResponseResponseOutputItem {
-    pub fn new(
-        type_: CreateResponseResponseOutputItemTypeEnum,
-        content: Vec<CreateResponseResponseOutputItemContentItem>,
-    ) -> Self {
-        Self {
-            type_,
-            id: None,
-            status: None,
-            role: None,
-            content,
-            call_id: None,
-            name: None,
-            arguments: None,
-        }
-    }
-}
-
-/// The type of the tool.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub enum CreateResponseResponseToolsItemTypeEnum {
-    #[default]
-    Function,
-    Unknown(String),
-}
-
-impl CreateResponseResponseToolsItemTypeEnum {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Function => "function",
-            Self::Unknown(value) => value.as_str(),
-        }
-    }
-}
-
-impl serde::Serialize for CreateResponseResponseToolsItemTypeEnum {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de> serde::Deserialize<'de> for CreateResponseResponseToolsItemTypeEnum {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let value = <String as serde::Deserialize>::deserialize(deserializer)?;
-        Ok(match value.as_str() {
-            "function" => Self::Function,
-            _ => Self::Unknown(value),
-        })
-    }
-}
-
-impl std::fmt::Display for CreateResponseResponseToolsItemTypeEnum {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.as_str())
-    }
 }

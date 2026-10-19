@@ -79,6 +79,18 @@ impl<'de> serde::Deserialize<'de> for EmbeddingDataItemEmbedding {
     }
 }
 
+impl ::std::convert::From<Vec<f64>> for EmbeddingDataItemEmbedding {
+    fn from(value: Vec<f64>) -> Self {
+        Self::NumberArray(value)
+    }
+}
+
+impl ::std::convert::From<String> for EmbeddingDataItemEmbedding {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
 /// One row in the embeddings `data` array, aligned with a single `input` item.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct EmbeddingDataItem {
@@ -468,13 +480,4 @@ impl std::fmt::Display for ListModelsResponseObjectEnum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.as_str())
     }
-}
-
-/// Response listing available models.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct ListModelsResponse {
-    /// The object type, which is always "list".
-    pub object: ListModelsResponseObjectEnum,
-    /// The list of available models.
-    pub data: Vec<Model>,
 }

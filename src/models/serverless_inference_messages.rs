@@ -86,6 +86,20 @@ impl<'de> serde::Deserialize<'de> for MessagesApiMessageParamContent {
     }
 }
 
+impl ::std::convert::From<String> for MessagesApiMessageParamContent {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<Vec<MessagesRequestContentBlockParam>>
+    for MessagesApiMessageParamContent
+{
+    fn from(value: Vec<MessagesRequestContentBlockParam>) -> Self {
+        Self::MessagesRequestContentBlockParamArray(value)
+    }
+}
+
 /// One turn in the conversation. Roles are `user` or `assistant` (no `system` role; use the top-level `system` field). Content may be a string (equivalent to a single text block) or an array of content blocks.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MessagesApiMessageParam {
@@ -214,6 +228,18 @@ impl<'de> serde::Deserialize<'de> for MessagesCreateRequestSystem {
         lossy.ok_or_else(|| {
             serde::de::Error::custom("no MessagesCreateRequestSystem branch accepts this payload")
         })
+    }
+}
+
+impl ::std::convert::From<String> for MessagesCreateRequestSystem {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<Vec<MessagesRequestTextBlockParam>> for MessagesCreateRequestSystem {
+    fn from(value: Vec<MessagesRequestTextBlockParam>) -> Self {
+        Self::MessagesRequestTextBlockParamArray(value)
     }
 }
 
@@ -486,22 +512,4 @@ pub enum MessagesCreateResponseTypeEnum {
     #[default]
     Message,
     Unknown(String),
-}
-
-impl MessagesCreateResponseTypeEnum {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Message => "message",
-            Self::Unknown(value) => value.as_str(),
-        }
-    }
-}
-
-impl serde::Serialize for MessagesCreateResponseTypeEnum {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
 }

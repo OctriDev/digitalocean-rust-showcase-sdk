@@ -309,6 +309,24 @@ impl<'de> serde::Deserialize<'de> for TracesFilterValueVariant3Item {
     }
 }
 
+impl ::std::convert::From<String> for TracesFilterValueVariant3Item {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<f64> for TracesFilterValueVariant3Item {
+    fn from(value: f64) -> Self {
+        Self::Number(value)
+    }
+}
+
+impl ::std::convert::From<bool> for TracesFilterValueVariant3Item {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
+    }
+}
+
 /// Required enumerated value serialized in the `type` wire field.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum TracesFilterValueVariant4TypeEnum {
@@ -401,6 +419,24 @@ impl<'de> serde::Deserialize<'de> for TracesFilterValueVariant4Value {
     }
 }
 
+impl ::std::convert::From<String> for TracesFilterValueVariant4Value {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<f64> for TracesFilterValueVariant4Value {
+    fn from(value: f64) -> Self {
+        Self::Number(value)
+    }
+}
+
+impl ::std::convert::From<bool> for TracesFilterValueVariant4Value {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
+    }
+}
+
 /// A typed scalar value. `type` is case-insensitive; `int`, `integer`, and `float` are accepted as aliases for `number`, and `boolean` for `bool`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TracesFilterValueVariant4 {
@@ -443,57 +479,5 @@ impl serde::Serialize for TracesFilterValueVariant5TypeEnum {
         S: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de> serde::Deserialize<'de> for TracesFilterValueVariant5TypeEnum {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let value = <String as serde::Deserialize>::deserialize(deserializer)?;
-        Ok(match value.as_str() {
-            "string_array" => Self::StringArray,
-            _ => Self::Unknown(value),
-        })
-    }
-}
-
-impl std::fmt::Display for TracesFilterValueVariant5TypeEnum {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.as_str())
-    }
-}
-
-/// A typed string list, used with the `in` operator.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct TracesFilterValueVariant5 {
-    /// Required enumerated value serialized in the `type` wire field.
-    #[serde(rename = "type")]
-    pub type_: TracesFilterValueVariant5TypeEnum,
-    /// Required array value serialized in the `value` wire field.
-    pub value: Vec<String>,
-}
-
-impl TracesFilterValueVariant5 {
-    pub(super) fn validate_constraints(&self) -> Result<(), crate::errors::SdkError> {
-        crate::validation::validate_items(
-            "value",
-            self.value.as_slice(),
-            crate::validation::LengthOpts {
-                min: Some(1),
-                max: Some(100),
-            },
-        )?;
-        Ok(())
-    }
-
-    pub fn new(
-        type_: TracesFilterValueVariant5TypeEnum,
-        value: Vec<String>,
-    ) -> Result<Self, crate::errors::SdkError> {
-        let value = Self { type_, value };
-        value.validate_constraints()?;
-        Ok(value)
     }
 }

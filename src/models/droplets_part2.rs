@@ -3,6 +3,42 @@
 
 // droplets domain models (part 2)
 
+impl<'de> serde::Deserialize<'de> for DropletCreateSshKeysItem {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let value = <serde_json::Value as serde::Deserialize>::deserialize(deserializer)?;
+        let mut lossy = None;
+        if let Ok(branch) = serde_json::from_value::<String>(value.clone()) {
+            let candidate = Self::String(branch);
+            if crate::client::keeps_every_key(&value, &candidate) {
+                return Ok(candidate);
+            }
+            lossy.get_or_insert(candidate);
+        }
+        if let Ok(branch) = serde_json::from_value::<i64>(value.clone()) {
+            let candidate = Self::Integer(branch);
+            if crate::client::keeps_every_key(&value, &candidate) {
+                return Ok(candidate);
+            }
+            lossy.get_or_insert(candidate);
+        }
+        lossy.ok_or_else(|| {
+            serde::de::Error::custom("no DropletCreateSshKeysItem branch accepts this payload")
+        })
+    }
+}
+
+impl ::std::convert::From<String> for DropletCreateSshKeysItem {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<i64> for DropletCreateSshKeysItem {
+    fn from(value: i64) -> Self {
+        Self::Integer(value)
+    }
+}
+
 /// Typed representation of the `DropletCreate` API schema.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DropletCreate {
@@ -112,6 +148,18 @@ impl<'de> serde::Deserialize<'de> for DropletCreateRequestImage {
     }
 }
 
+impl ::std::convert::From<String> for DropletCreateRequestImage {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<i64> for DropletCreateRequestImage {
+    fn from(value: i64) -> Self {
+        Self::Integer(value)
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
 pub enum DropletCreateRequestSshKeysItem {
@@ -142,6 +190,18 @@ impl<'de> serde::Deserialize<'de> for DropletCreateRequestSshKeysItem {
                 "no DropletCreateRequestSshKeysItem branch accepts this payload",
             )
         })
+    }
+}
+
+impl ::std::convert::From<String> for DropletCreateRequestSshKeysItem {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<i64> for DropletCreateRequestSshKeysItem {
+    fn from(value: i64) -> Self {
+        Self::Integer(value)
     }
 }
 
@@ -419,79 +479,5 @@ impl serde::Serialize for DropletSnapshotVariant2TypeEnum {
         S: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de> serde::Deserialize<'de> for DropletSnapshotVariant2TypeEnum {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let value = <String as serde::Deserialize>::deserialize(deserializer)?;
-        Ok(match value.as_str() {
-            "snapshot" => Self::Snapshot,
-            "backup" => Self::Backup,
-            _ => Self::Unknown(value),
-        })
-    }
-}
-
-impl std::fmt::Display for DropletSnapshotVariant2TypeEnum {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.as_str())
-    }
-}
-
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct DropletSnapshotVariant2 {
-    /// Describes the kind of image. It may be one of `snapshot` or `backup`. This specifies whether an image is a user-generated Droplet snapshot or automatically created Droplet backup.
-    #[serde(rename = "type")]
-    pub type_: DropletSnapshotVariant2TypeEnum,
-}
-
-impl DropletSnapshotVariant2 {
-    pub fn new(type_: DropletSnapshotVariant2TypeEnum) -> Self {
-        Self { type_ }
-    }
-}
-
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct DropletSnapshot {
-    #[serde(flatten)]
-    pub member_0: DropletSnapshotVariant0,
-    #[serde(flatten)]
-    pub member_1: SnapshotsBase,
-    #[serde(flatten)]
-    pub member_2: DropletSnapshotVariant2,
-}
-
-impl DropletSnapshot {
-    pub fn new(
-        member_0: DropletSnapshotVariant0,
-        member_1: SnapshotsBase,
-        member_2: DropletSnapshotVariant2,
-    ) -> Self {
-        Self {
-            member_0,
-            member_1,
-            member_2,
-        }
-    }
-}
-
-/// Typed representation of the `DropletsSupportedBackupPolicies` API schema.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct DropletsSupportedBackupPolicies {
-    /// Optional array value serialized in the `supported_policies` wire field.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub supported_policies: Option<Vec<SupportedDropletBackupPolicy>>,
-}
-
-impl DropletsSupportedBackupPolicies {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            supported_policies: None,
-        }
     }
 }

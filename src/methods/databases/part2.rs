@@ -97,6 +97,30 @@ impl<'de> serde::Deserialize<'de> for DatabasesCreateLogsinkConfig {
     }
 }
 
+impl ::std::convert::From<Box<RsyslogLogsink>> for DatabasesCreateLogsinkConfig {
+    fn from(value: Box<RsyslogLogsink>) -> Self {
+        Self::RsyslogLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<ElasticsearchLogsink>> for DatabasesCreateLogsinkConfig {
+    fn from(value: Box<ElasticsearchLogsink>) -> Self {
+        Self::ElasticsearchLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<OpensearchLogsink>> for DatabasesCreateLogsinkConfig {
+    fn from(value: Box<OpensearchLogsink>) -> Self {
+        Self::OpensearchLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<DatadogLogsink>> for DatabasesCreateLogsinkConfig {
+    fn from(value: Box<DatadogLogsink>) -> Self {
+        Self::DatadogLogsink(value)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum DatabasesCreateLogsinkSinkTypeEnum {
     #[default]
@@ -259,33 +283,5 @@ impl<'de> serde::Deserialize<'de> for DatabasesUpdateKafkaSchemaConfigCompatibil
 impl std::fmt::Display for DatabasesUpdateKafkaSchemaConfigCompatibilityLevelEnum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.as_str())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Default)]
-pub enum DatabasesUpdateKafkaSchemaSubjectConfigCompatibilityLevelEnum {
-    #[default]
-    Backward,
-    BackwardTransitive,
-    Forward,
-    ForwardTransitive,
-    Full,
-    FullTransitive,
-    None,
-    Unknown(String),
-}
-
-impl DatabasesUpdateKafkaSchemaSubjectConfigCompatibilityLevelEnum {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Backward => "BACKWARD",
-            Self::BackwardTransitive => "BACKWARD_TRANSITIVE",
-            Self::Forward => "FORWARD",
-            Self::ForwardTransitive => "FORWARD_TRANSITIVE",
-            Self::Full => "FULL",
-            Self::FullTransitive => "FULL_TRANSITIVE",
-            Self::None => "NONE",
-            Self::Unknown(value) => value.as_str(),
-        }
     }
 }

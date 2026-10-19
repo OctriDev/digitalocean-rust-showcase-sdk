@@ -6,11 +6,67 @@ use crate::client::ClientConfig;
 use crate::client::{sdk_request, RequestOptions, RequestOpts};
 use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{
-    DatabaseSchemaRegistryConfig, DatabaseSchemaRegistrySubjectConfig, KafkaSchema,
-    KafkaSchemaVersion, KafkaSchemas, KafkaTopicConfig, KafkaTopicResponse, KafkaTopicUpdate,
-    KafkaTopics, Logsink, LogsinkSchema, LogsinkUpdateConfig, Logsinks,
+    DatabaseSchemaRegistryConfig, DatabaseStorageAutoscaleParams, KafkaSchema, KafkaSchemaVersion,
+    KafkaSchemas, KafkaTopicConfig, KafkaTopicResponse, KafkaTopicUpdate, KafkaTopics, Logsink,
+    LogsinkSchema, LogsinkUpdateConfig, Logsinks,
 };
 use crate::validation::validate_uuid;
+
+/// Replaces the autoscaling configuration for an existing database cluster. Send the `storage` configuration to control storage autoscaling, including whether it is enabled. The successful response has no body.
+///
+/// To configure autoscale settings for an existing database cluster, send a PUT request to `/v2/databases/$DATABASE_ID/autoscale`, specifying the autoscale configuration. A successful request will receive a 204 No Content status code with no body in response.
+///
+/// # Arguments
+///
+/// * `database_cluster_uuid` - A unique identifier for a database cluster.
+/// * `storage` - Storage autoscaling configuration
+pub fn databases_update_autoscale(
+    config: &ClientConfig,
+    database_cluster_uuid: String,
+    storage: Option<DatabaseStorageAutoscaleParams>,
+    options: Option<&RequestOptions>,
+) -> Result<serde_json::Value, SdkError> {
+    validate_uuid("database_cluster_uuid", &database_cluster_uuid)?;
+
+    let mut __body_map = serde_json::Map::new();
+    if let Some(ref value) = storage {
+        __body_map.insert(
+            "storage".to_string(),
+            serde_json::to_value(value).map_err(|e| {
+                SdkError::Network(SdkNetworkError {
+                    message: format!("encode body field: {}", e),
+                    request_id: None,
+                })
+            })?,
+        );
+    }
+    let __body = serde_json::Value::Object(__body_map);
+
+    Ok(sdk_request::<serde_json::Value>(
+        "PUT",
+        &format!(
+            "/v2/databases/{}/autoscale",
+            crate::client::encode_path_segment(&database_cluster_uuid)
+        ),
+        config,
+        RequestOpts {
+            body: Some(__body),
+            decoder: crate::client::ResponseDecoder::Empty,
+            operation_id: "databases_update_autoscale",
+            options,
+            errors: &[
+                ("401", "Error2"),
+                ("404", "Error2"),
+                ("422", "Error2"),
+                ("429", "Error2"),
+                ("500", "Error2"),
+                ("default", "Error2"),
+            ],
+            ..Default::default()
+        },
+    )?
+    .data)
+}
 
 /// To list all of a Kafka cluster's topics, send a GET request to `/v2/databases/$DATABASE_ID/topics`. The result will be a JSON object with a `topics` key.
 ///
@@ -777,96 +833,6 @@ pub fn databases_get_kafka_schema_config(
         RequestOpts {
             decoder: crate::client::ResponseDecoder::Json,
             operation_id: "databases_get_kafka_schema_config",
-            options,
-            errors: &[
-                ("401", "Error2"),
-                ("404", "Error2"),
-                ("429", "Error2"),
-                ("500", "Error2"),
-                ("default", "Error2"),
-            ],
-            ..Default::default()
-        },
-    )?
-    .data)
-}
-
-/// To update the Schema Registry configuration for a Kafka cluster, send a PUT request to `/v2/databases/$DATABASE_ID/schema-registry/config`. The response is a JSON object with a `compatibility_level` key, which is set to an object containing any database configuration parameters.
-///
-/// # Arguments
-///
-/// * `database_cluster_uuid` - A unique identifier for a database cluster.
-/// * `compatibility_level` - The compatibility level of the schema registry.
-pub fn databases_update_kafka_schema_config(
-    config: &ClientConfig,
-    database_cluster_uuid: String,
-    compatibility_level: DatabasesUpdateKafkaSchemaConfigCompatibilityLevelEnum,
-    options: Option<&RequestOptions>,
-) -> Result<DatabaseSchemaRegistryConfig, SdkError> {
-    validate_uuid("database_cluster_uuid", &database_cluster_uuid)?;
-
-    let mut __body_map = serde_json::Map::new();
-    __body_map.insert(
-        "compatibility_level".to_string(),
-        serde_json::to_value(compatibility_level).map_err(|e| {
-            SdkError::Network(SdkNetworkError {
-                message: format!("encode body field: {}", e),
-                request_id: None,
-            })
-        })?,
-    );
-    let __body = serde_json::Value::Object(__body_map);
-
-    Ok(sdk_request::<DatabaseSchemaRegistryConfig>(
-        "PUT",
-        &format!(
-            "/v2/databases/{}/schema-registry/config",
-            crate::client::encode_path_segment(&database_cluster_uuid)
-        ),
-        config,
-        RequestOpts {
-            body: Some(__body),
-            decoder: crate::client::ResponseDecoder::Json,
-            operation_id: "databases_update_kafka_schema_config",
-            options,
-            errors: &[
-                ("401", "Error2"),
-                ("404", "Error2"),
-                ("429", "Error2"),
-                ("500", "Error2"),
-                ("default", "Error2"),
-            ],
-            ..Default::default()
-        },
-    )?
-    .data)
-}
-
-/// To retrieve the Schema Registry configuration for a Subject of a Kafka cluster, send a GET request to `/v2/databases/$DATABASE_ID/schema-registry/config/$SUBJECT_NAME`. The response is a JSON object with a `compatibility_level` key, which is set to an object containing any database configuration parameters.
-///
-/// # Arguments
-///
-/// * `database_cluster_uuid` - A unique identifier for a database cluster.
-/// * `subject_name` - The name of the Kafka schema subject.
-pub fn databases_get_kafka_schema_subject_config(
-    config: &ClientConfig,
-    database_cluster_uuid: String,
-    subject_name: String,
-    options: Option<&RequestOptions>,
-) -> Result<DatabaseSchemaRegistrySubjectConfig, SdkError> {
-    validate_uuid("database_cluster_uuid", &database_cluster_uuid)?;
-
-    Ok(sdk_request::<DatabaseSchemaRegistrySubjectConfig>(
-        "GET",
-        &format!(
-            "/v2/databases/{}/schema-registry/config/{}",
-            crate::client::encode_path_segment(&database_cluster_uuid),
-            crate::client::encode_path_segment(&subject_name)
-        ),
-        config,
-        RequestOpts {
-            decoder: crate::client::ResponseDecoder::Json,
-            operation_id: "databases_get_kafka_schema_subject_config",
             options,
             errors: &[
                 ("401", "Error2"),

@@ -3,6 +3,12 @@
 
 // add_ons domain models (part 2)
 
+impl std::fmt::Display for AddonsPlanStateEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
 /// Typed representation of the `AddonsPlan` API schema.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct AddonsPlan {
@@ -240,6 +246,18 @@ impl<'de> serde::Deserialize<'de> for AddonsResourceMetadataValue {
         lossy.ok_or_else(|| {
             serde::de::Error::custom("no AddonsResourceMetadataValue branch accepts this payload")
         })
+    }
+}
+
+impl ::std::convert::From<String> for AddonsResourceMetadataValue {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<bool> for AddonsResourceMetadataValue {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
     }
 }
 

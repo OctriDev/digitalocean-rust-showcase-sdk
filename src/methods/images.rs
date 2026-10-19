@@ -40,6 +40,18 @@ impl<'de> serde::Deserialize<'de> for ImagesGet {
     }
 }
 
+impl ::std::convert::From<i64> for ImagesGet {
+    fn from(value: i64) -> Self {
+        Self::Integer(value)
+    }
+}
+
+impl ::std::convert::From<String> for ImagesGet {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum ImagesListEnum {
     #[default]

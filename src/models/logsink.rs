@@ -50,6 +50,30 @@ impl<'de> serde::Deserialize<'de> for LogsinkCreateVariant1Config {
     }
 }
 
+impl ::std::convert::From<Box<RsyslogLogsink>> for LogsinkCreateVariant1Config {
+    fn from(value: Box<RsyslogLogsink>) -> Self {
+        Self::RsyslogLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<ElasticsearchLogsink>> for LogsinkCreateVariant1Config {
+    fn from(value: Box<ElasticsearchLogsink>) -> Self {
+        Self::ElasticsearchLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<OpensearchLogsink>> for LogsinkCreateVariant1Config {
+    fn from(value: Box<OpensearchLogsink>) -> Self {
+        Self::OpensearchLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<DatadogLogsink>> for LogsinkCreateVariant1Config {
+    fn from(value: Box<DatadogLogsink>) -> Self {
+        Self::DatadogLogsink(value)
+    }
+}
+
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct LogsinkCreateVariant1 {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -121,6 +145,30 @@ impl<'de> serde::Deserialize<'de> for LogsinkVerboseVariant1Config {
         lossy.ok_or_else(|| {
             serde::de::Error::custom("no LogsinkVerboseVariant1Config branch accepts this payload")
         })
+    }
+}
+
+impl ::std::convert::From<Box<RsyslogLogsink>> for LogsinkVerboseVariant1Config {
+    fn from(value: Box<RsyslogLogsink>) -> Self {
+        Self::RsyslogLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<ElasticsearchLogsink>> for LogsinkVerboseVariant1Config {
+    fn from(value: Box<ElasticsearchLogsink>) -> Self {
+        Self::ElasticsearchLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<OpensearchLogsink>> for LogsinkVerboseVariant1Config {
+    fn from(value: Box<OpensearchLogsink>) -> Self {
+        Self::OpensearchLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<DatadogLogsink>> for LogsinkVerboseVariant1Config {
+    fn from(value: Box<DatadogLogsink>) -> Self {
+        Self::DatadogLogsink(value)
     }
 }
 

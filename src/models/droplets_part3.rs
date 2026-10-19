@@ -3,6 +3,80 @@
 
 // droplets domain models (part 3)
 
+impl<'de> serde::Deserialize<'de> for DropletSnapshotVariant2TypeEnum {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let value = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match value.as_str() {
+            "snapshot" => Self::Snapshot,
+            "backup" => Self::Backup,
+            _ => Self::Unknown(value),
+        })
+    }
+}
+
+impl std::fmt::Display for DropletSnapshotVariant2TypeEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct DropletSnapshotVariant2 {
+    /// Describes the kind of image. It may be one of `snapshot` or `backup`. This specifies whether an image is a user-generated Droplet snapshot or automatically created Droplet backup.
+    #[serde(rename = "type")]
+    pub type_: DropletSnapshotVariant2TypeEnum,
+}
+
+impl DropletSnapshotVariant2 {
+    pub fn new(type_: DropletSnapshotVariant2TypeEnum) -> Self {
+        Self { type_ }
+    }
+}
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct DropletSnapshot {
+    #[serde(flatten)]
+    pub member_0: DropletSnapshotVariant0,
+    #[serde(flatten)]
+    pub member_1: SnapshotsBase,
+    #[serde(flatten)]
+    pub member_2: DropletSnapshotVariant2,
+}
+
+impl DropletSnapshot {
+    pub fn new(
+        member_0: DropletSnapshotVariant0,
+        member_1: SnapshotsBase,
+        member_2: DropletSnapshotVariant2,
+    ) -> Self {
+        Self {
+            member_0,
+            member_1,
+            member_2,
+        }
+    }
+}
+
+/// Typed representation of the `DropletsSupportedBackupPolicies` API schema.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct DropletsSupportedBackupPolicies {
+    /// Optional array value serialized in the `supported_policies` wire field.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub supported_policies: Option<Vec<SupportedDropletBackupPolicy>>,
+}
+
+impl DropletsSupportedBackupPolicies {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            supported_policies: None,
+        }
+    }
+}
+
 /// Typed representation of the `ExistingDroplet` API schema.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct ExistingDroplet {

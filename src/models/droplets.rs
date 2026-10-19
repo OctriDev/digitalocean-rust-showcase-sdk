@@ -472,33 +472,21 @@ impl<'de> serde::Deserialize<'de> for DropletCreateImage {
     }
 }
 
+impl ::std::convert::From<String> for DropletCreateImage {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<i64> for DropletCreateImage {
+    fn from(value: i64) -> Self {
+        Self::Integer(value)
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
 pub enum DropletCreateSshKeysItem {
     String(String),
     Integer(i64),
-}
-
-impl<'de> serde::Deserialize<'de> for DropletCreateSshKeysItem {
-    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let value = <serde_json::Value as serde::Deserialize>::deserialize(deserializer)?;
-        let mut lossy = None;
-        if let Ok(branch) = serde_json::from_value::<String>(value.clone()) {
-            let candidate = Self::String(branch);
-            if crate::client::keeps_every_key(&value, &candidate) {
-                return Ok(candidate);
-            }
-            lossy.get_or_insert(candidate);
-        }
-        if let Ok(branch) = serde_json::from_value::<i64>(value.clone()) {
-            let candidate = Self::Integer(branch);
-            if crate::client::keeps_every_key(&value, &candidate) {
-                return Ok(candidate);
-            }
-            lossy.get_or_insert(candidate);
-        }
-        lossy.ok_or_else(|| {
-            serde::de::Error::custom("no DropletCreateSshKeysItem branch accepts this payload")
-        })
-    }
 }

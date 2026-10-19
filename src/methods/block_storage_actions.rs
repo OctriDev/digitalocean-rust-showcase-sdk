@@ -41,6 +41,18 @@ impl<'de> serde::Deserialize<'de> for VolumeActionsPost {
     }
 }
 
+impl ::std::convert::From<Box<VolumeActionPostAttach>> for VolumeActionsPost {
+    fn from(value: Box<VolumeActionPostAttach>) -> Self {
+        Self::VolumeActionPostAttach(value)
+    }
+}
+
+impl ::std::convert::From<Box<VolumeActionPostDetach>> for VolumeActionsPost {
+    fn from(value: Box<VolumeActionPostDetach>) -> Self {
+        Self::VolumeActionPostDetach(value)
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
 pub enum VolumeActionsPostById {
@@ -77,6 +89,24 @@ impl<'de> serde::Deserialize<'de> for VolumeActionsPostById {
         lossy.ok_or_else(|| {
             serde::de::Error::custom("no VolumeActionsPostById branch accepts this payload")
         })
+    }
+}
+
+impl ::std::convert::From<Box<VolumeActionPostAttach>> for VolumeActionsPostById {
+    fn from(value: Box<VolumeActionPostAttach>) -> Self {
+        Self::VolumeActionPostAttach(value)
+    }
+}
+
+impl ::std::convert::From<Box<VolumeActionPostDetach>> for VolumeActionsPostById {
+    fn from(value: Box<VolumeActionPostDetach>) -> Self {
+        Self::VolumeActionPostDetach(value)
+    }
+}
+
+impl ::std::convert::From<Box<VolumeActionPostResize>> for VolumeActionsPostById {
+    fn from(value: Box<VolumeActionPostResize>) -> Self {
+        Self::VolumeActionPostResize(value)
     }
 }
 

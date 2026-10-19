@@ -3,6 +3,25 @@
 
 // serverless_inference_messages domain models (part 3)
 
+/// Optional enumerated value serialized in the `speed` wire field.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub enum MessagesStreamEventUsageSpeedEnum {
+    #[default]
+    Standard,
+    Fast,
+    Unknown(String),
+}
+
+impl MessagesStreamEventUsageSpeedEnum {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Standard => "standard",
+            Self::Fast => "fast",
+            Self::Unknown(value) => value.as_str(),
+        }
+    }
+}
+
 impl serde::Serialize for MessagesStreamEventUsageSpeedEnum {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -273,6 +292,20 @@ impl<'de> serde::Deserialize<'de> for MessagesToolResultBlockParamContent {
                 "no MessagesToolResultBlockParamContent branch accepts this payload",
             )
         })
+    }
+}
+
+impl ::std::convert::From<String> for MessagesToolResultBlockParamContent {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<Vec<std::collections::HashMap<String, serde_json::Value>>>
+    for MessagesToolResultBlockParamContent
+{
+    fn from(value: Vec<std::collections::HashMap<String, serde_json::Value>>) -> Self {
+        Self::ValueMapArray(value)
     }
 }
 
