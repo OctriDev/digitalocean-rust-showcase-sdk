@@ -228,6 +228,18 @@ impl<'de> serde::Deserialize<'de> for ChatCompletionRequestStop {
     }
 }
 
+impl ::std::convert::From<String> for ChatCompletionRequestStop {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<Vec<String>> for ChatCompletionRequestStop {
+    fn from(value: Vec<String>) -> Self {
+        Self::StringArray(value)
+    }
+}
+
 /// Options for streaming response. Only set this when you set stream to true.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct ChatCompletionRequestStreamOptions {
@@ -557,14 +569,4 @@ impl ChatCompletionRequest {
         value.validate_constraints()?;
         Ok(value)
     }
-}
-
-/// Optional enumerated value serialized in the `tool_choice` wire field.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub enum ChatCompletionRequestToolChoiceVariant0Enum {
-    #[default]
-    None,
-    Auto,
-    Required,
-    Unknown(String),
 }

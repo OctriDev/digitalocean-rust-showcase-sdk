@@ -98,6 +98,60 @@ impl<'de> serde::Deserialize<'de> for DomainsCreateRecord {
     }
 }
 
+impl ::std::convert::From<Box<DomainRecordARequest>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordARequest>) -> Self {
+        Self::DomainRecordARequest(value)
+    }
+}
+
+impl ::std::convert::From<Box<DomainRecordAaaa>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordAaaa>) -> Self {
+        Self::DomainRecordAaaa(value)
+    }
+}
+
+impl ::std::convert::From<Box<DomainRecordCaa>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordCaa>) -> Self {
+        Self::DomainRecordCaa(value)
+    }
+}
+
+impl ::std::convert::From<Box<DomainRecordCname>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordCname>) -> Self {
+        Self::DomainRecordCname(value)
+    }
+}
+
+impl ::std::convert::From<Box<DomainRecordMx>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordMx>) -> Self {
+        Self::DomainRecordMx(value)
+    }
+}
+
+impl ::std::convert::From<Box<DomainRecordNs>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordNs>) -> Self {
+        Self::DomainRecordNs(value)
+    }
+}
+
+impl ::std::convert::From<Box<DomainRecordSoa>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordSoa>) -> Self {
+        Self::DomainRecordSoa(value)
+    }
+}
+
+impl ::std::convert::From<Box<DomainRecordSrv>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordSrv>) -> Self {
+        Self::DomainRecordSrv(value)
+    }
+}
+
+impl ::std::convert::From<Box<DomainRecordTxt>> for DomainsCreateRecord {
+    fn from(value: Box<DomainRecordTxt>) -> Self {
+        Self::DomainRecordTxt(value)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum DomainsListRecordsEnum {
     #[default]
@@ -327,186 +381,6 @@ pub fn domains_get_record(
         RequestOpts {
             decoder: crate::client::ResponseDecoder::Json,
             operation_id: "domains_get_record",
-            options,
-            errors: &[
-                ("401", "Error2"),
-                ("404", "Error2"),
-                ("429", "Error2"),
-                ("500", "Error2"),
-                ("default", "Error2"),
-            ],
-            ..Default::default()
-        },
-    )?
-    .data)
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct DomainsPatchRecordParams {
-    pub domain_name: String,
-    pub domain_record_id: i64,
-    pub type_: String,
-    pub name: Option<String>,
-    pub data: Option<String>,
-    pub priority: Option<Option<i64>>,
-    pub port: Option<Option<i64>>,
-    pub ttl: Option<i64>,
-    pub weight: Option<Option<i64>>,
-    pub flags: Option<Option<i64>>,
-    pub tag: Option<Option<String>>,
-}
-
-/// To update an existing record, send a PATCH request to `/v2/domains/$DOMAIN_NAME/records/$DOMAIN_RECORD_ID`. Any attribute valid for the record type can be set to a new value for the record. See the attribute table for details regarding record types and their respective attributes.
-///
-/// # Arguments
-///
-/// * `domain_name` - The name of the domain itself.
-/// * `domain_record_id` - The unique identifier of the domain record.
-/// * `type_` - The type of the DNS record. For example: A, CNAME, TXT, ...
-/// * `name` - The host name, alias, or service being defined by the record.
-/// * `data` - Variable data depending on record type. For example, the "data"
-///   value for an A record would be the IPv4 address to which the domain will be
-///   mapped. For a CAA record, it would contain the domain name of the CA being
-///   granted permission to issue certificates.
-/// * `priority` - The priority for SRV and MX records.
-/// * `port` - The port for SRV records.
-/// * `ttl` - This value is the time to live for the record, in seconds. This
-///   defines the time frame that clients can cache queried information before a
-///   refresh should be requested.
-/// * `weight` - The weight for SRV records.
-/// * `flags` - An unsigned integer between 0-255 used for CAA records.
-/// * `tag` - The parameter tag for CAA records. Valid values are "issue",
-///   "issuewild", or "iodef"
-pub fn domains_patch_record(
-    config: &ClientConfig,
-    params: DomainsPatchRecordParams,
-    options: Option<&RequestOptions>,
-) -> Result<DomainRecordResponse, SdkError> {
-    let DomainsPatchRecordParams {
-        domain_name,
-        domain_record_id,
-        type_,
-        name,
-        data,
-        priority,
-        port,
-        ttl,
-        weight,
-        flags,
-        tag,
-    } = params;
-    let mut __body_map = serde_json::Map::new();
-    __body_map.insert(
-        "type".to_string(),
-        serde_json::to_value(type_).map_err(|e| {
-            SdkError::Network(SdkNetworkError {
-                message: format!("encode body field: {}", e),
-                request_id: None,
-            })
-        })?,
-    );
-    if let Some(ref value) = name {
-        __body_map.insert(
-            "name".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    if let Some(ref value) = data {
-        __body_map.insert(
-            "data".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    if let Some(ref value) = priority {
-        __body_map.insert(
-            "priority".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    if let Some(ref value) = port {
-        __body_map.insert(
-            "port".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    if let Some(ref value) = ttl {
-        __body_map.insert(
-            "ttl".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    if let Some(ref value) = weight {
-        __body_map.insert(
-            "weight".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    if let Some(ref value) = flags {
-        __body_map.insert(
-            "flags".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    if let Some(ref value) = tag {
-        __body_map.insert(
-            "tag".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    let __body = serde_json::Value::Object(__body_map);
-
-    Ok(sdk_request::<DomainRecordResponse>(
-        "PATCH",
-        &format!(
-            "/v2/domains/{}/records/{}",
-            crate::client::encode_path_segment(&domain_name),
-            crate::client::encode_path_segment(&domain_record_id)
-        ),
-        config,
-        RequestOpts {
-            body: Some(__body),
-            decoder: crate::client::ResponseDecoder::Json,
-            operation_id: "domains_patch_record",
             options,
             errors: &[
                 ("401", "Error2"),

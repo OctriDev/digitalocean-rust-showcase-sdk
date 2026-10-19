@@ -3,6 +3,38 @@
 
 // insights_spans domain models (part 2)
 
+impl SpansPaginationRequest {
+    pub(super) fn validate_constraints(&self) -> Result<(), crate::errors::SdkError> {
+        if let Some(value) = self.limit.as_ref() {
+            crate::validation::validate_range(
+                "limit",
+                *value as f64,
+                crate::validation::RangeOpts {
+                    min: Some(1_f64),
+                    max: Some(1000_f64),
+                    ..Default::default()
+                },
+            )?;
+        }
+        Ok(())
+    }
+
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Result<Self, crate::errors::SdkError> {
+        let value = Self { limit: None };
+        value.validate_constraints()?;
+        Ok(value)
+    }
+}
+
+/// Pagination metadata for a spans search response.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct SpansPaginationResponse {
+    /// Whether more spans matched than were returned in this page. Cursor-based continuation is not yet supported.
+    #[serde(rename = "hasMore", skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
+}
+
 impl SpansPaginationResponse {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {

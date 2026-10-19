@@ -40,6 +40,18 @@ impl<'de> serde::Deserialize<'de> for ReservedIPsActionsPost {
     }
 }
 
+impl ::std::convert::From<Box<ReservedIpActionUnassign>> for ReservedIPsActionsPost {
+    fn from(value: Box<ReservedIpActionUnassign>) -> Self {
+        Self::ReservedIpActionUnassign(value)
+    }
+}
+
+impl ::std::convert::From<Box<ReservedIpActionAssign>> for ReservedIPsActionsPost {
+    fn from(value: Box<ReservedIpActionAssign>) -> Self {
+        Self::ReservedIpActionAssign(value)
+    }
+}
+
 /// To retrieve all actions that have been executed on a reserved IP, send a GET request to `/v2/reserved_ips/$RESERVED_IP/actions`.
 ///
 /// # Arguments

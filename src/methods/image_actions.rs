@@ -38,6 +38,18 @@ impl<'de> serde::Deserialize<'de> for ImageActionsPost {
     }
 }
 
+impl ::std::convert::From<Box<ImageActionBase>> for ImageActionsPost {
+    fn from(value: Box<ImageActionBase>) -> Self {
+        Self::ImageActionBase(value)
+    }
+}
+
+impl ::std::convert::From<Box<ImageActionTransfer>> for ImageActionsPost {
+    fn from(value: Box<ImageActionTransfer>) -> Self {
+        Self::ImageActionTransfer(value)
+    }
+}
+
 /// To retrieve all actions that have been executed on an image, send a GET request to `/v2/images/$IMAGE_ID/actions`.
 ///
 /// # Arguments

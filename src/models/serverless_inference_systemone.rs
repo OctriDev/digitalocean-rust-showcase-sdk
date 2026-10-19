@@ -178,6 +178,18 @@ impl<'de> serde::Deserialize<'de> for SystemoneQuestionCriteria {
     }
 }
 
+impl ::std::convert::From<std::collections::HashMap<String, String>> for SystemoneQuestionCriteria {
+    fn from(value: std::collections::HashMap<String, String>) -> Self {
+        Self::StringMap(value)
+    }
+}
+
+impl ::std::convert::From<Vec<String>> for SystemoneQuestionCriteria {
+    fn from(value: Vec<String>) -> Self {
+        Self::StringArray(value)
+    }
+}
+
 /// A single question to evaluate against the provided state. The `type` field determines how `criteria` should be shaped and how the corresponding answer is returned.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct SystemoneQuestion {

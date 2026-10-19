@@ -334,6 +334,18 @@ impl<'de> serde::Deserialize<'de> for AddonsFeatureValue {
     }
 }
 
+impl ::std::convert::From<String> for AddonsFeatureValue {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<bool> for AddonsFeatureValue {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
+    }
+}
+
 /// Typed representation of the `AddonsFeature` API schema.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AddonsFeature {
@@ -495,11 +507,5 @@ impl<'de> serde::Deserialize<'de> for AddonsPlanStateEnum {
             "archived" => Self::Archived,
             _ => Self::Unknown(value),
         })
-    }
-}
-
-impl std::fmt::Display for AddonsPlanStateEnum {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.as_str())
     }
 }

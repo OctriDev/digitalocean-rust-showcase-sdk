@@ -7,10 +7,97 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{
     Autoscale, ConnectionPoolRequestConnection, ConnectionPoolRequestPrivateConnection,
     ConnectionPoolRequestStandbyConnection, ConnectionPoolRequestStandbyPrivateConnection,
-    ConnectionPoolResponse, ConnectionPools, DatabaseResponse, DatabaseStorageAutoscaleParams,
-    EvictionPolicyModel, EvictionPolicyResponse, SqlMode, Version,
+    ConnectionPoolResponse, ConnectionPools, DatabaseResponse, Databases, EvictionPolicyModel,
+    EvictionPolicyResponse, SqlMode, Version,
 };
 use crate::validation::validate_uuid;
+
+/// To list all of the databases in a clusters, send a GET request to `/v2/databases/$DATABASE_ID/dbs`. The result will be a JSON object with a `dbs` key. This will be set to an array of database objects, each of which will contain the standard database attributes. Note: Database management is not supported for Caching or Valkey clusters.
+///
+/// # Arguments
+///
+/// * `database_cluster_uuid` - A unique identifier for a database cluster.
+pub fn databases_list(
+    config: &ClientConfig,
+    database_cluster_uuid: String,
+    options: Option<&RequestOptions>,
+) -> Result<Databases, SdkError> {
+    validate_uuid("database_cluster_uuid", &database_cluster_uuid)?;
+
+    Ok(sdk_request::<Databases>(
+        "GET",
+        &format!(
+            "/v2/databases/{}/dbs",
+            crate::client::encode_path_segment(&database_cluster_uuid)
+        ),
+        config,
+        RequestOpts {
+            decoder: crate::client::ResponseDecoder::Json,
+            operation_id: "databases_list",
+            options,
+            errors: &[
+                ("401", "Error2"),
+                ("404", "Error2"),
+                ("429", "Error2"),
+                ("500", "Error2"),
+                ("default", "Error2"),
+            ],
+            ..Default::default()
+        },
+    )?
+    .data)
+}
+
+/// To add a new database to an existing cluster, send a POST request to `/v2/databases/$DATABASE_ID/dbs`. Note: Database management is not supported for Caching or Valkey clusters. The response will be a JSON object with a key called `db`. The value of this will be an object that contains the standard attributes associated with a database.
+///
+/// # Arguments
+///
+/// * `database_cluster_uuid` - A unique identifier for a database cluster.
+/// * `name` - The name of the database.
+pub fn databases_add(
+    config: &ClientConfig,
+    database_cluster_uuid: String,
+    name: String,
+    options: Option<&RequestOptions>,
+) -> Result<DatabaseResponse, SdkError> {
+    validate_uuid("database_cluster_uuid", &database_cluster_uuid)?;
+
+    let mut __body_map = serde_json::Map::new();
+    __body_map.insert(
+        "name".to_string(),
+        serde_json::to_value(name).map_err(|e| {
+            SdkError::Network(SdkNetworkError {
+                message: format!("encode body field: {}", e),
+                request_id: None,
+            })
+        })?,
+    );
+    let __body = serde_json::Value::Object(__body_map);
+
+    Ok(sdk_request::<DatabaseResponse>(
+        "POST",
+        &format!(
+            "/v2/databases/{}/dbs",
+            crate::client::encode_path_segment(&database_cluster_uuid)
+        ),
+        config,
+        RequestOpts {
+            body: Some(__body),
+            decoder: crate::client::ResponseDecoder::Json,
+            operation_id: "databases_add",
+            options,
+            errors: &[
+                ("401", "Error2"),
+                ("404", "Error2"),
+                ("429", "Error2"),
+                ("500", "Error2"),
+                ("default", "Error2"),
+            ],
+            ..Default::default()
+        },
+    )?
+    .data)
+}
 
 /// To show information about an existing database cluster, send a GET request to `/v2/databases/$DATABASE_ID/dbs/$DB_NAME`. Note: Database management is not supported for Caching or Valkey clusters. The response will be a JSON object with a `db` key. This will be set to an object containing the standard database attributes.
 ///
@@ -749,62 +836,6 @@ pub fn databases_get_autoscale(
             errors: &[
                 ("401", "Error2"),
                 ("404", "Error2"),
-                ("429", "Error2"),
-                ("500", "Error2"),
-                ("default", "Error2"),
-            ],
-            ..Default::default()
-        },
-    )?
-    .data)
-}
-
-/// Replaces the autoscaling configuration for an existing database cluster. Send the `storage` configuration to control storage autoscaling, including whether it is enabled. The successful response has no body.
-///
-/// To configure autoscale settings for an existing database cluster, send a PUT request to `/v2/databases/$DATABASE_ID/autoscale`, specifying the autoscale configuration. A successful request will receive a 204 No Content status code with no body in response.
-///
-/// # Arguments
-///
-/// * `database_cluster_uuid` - A unique identifier for a database cluster.
-/// * `storage` - Storage autoscaling configuration
-pub fn databases_update_autoscale(
-    config: &ClientConfig,
-    database_cluster_uuid: String,
-    storage: Option<DatabaseStorageAutoscaleParams>,
-    options: Option<&RequestOptions>,
-) -> Result<serde_json::Value, SdkError> {
-    validate_uuid("database_cluster_uuid", &database_cluster_uuid)?;
-
-    let mut __body_map = serde_json::Map::new();
-    if let Some(ref value) = storage {
-        __body_map.insert(
-            "storage".to_string(),
-            serde_json::to_value(value).map_err(|e| {
-                SdkError::Network(SdkNetworkError {
-                    message: format!("encode body field: {}", e),
-                    request_id: None,
-                })
-            })?,
-        );
-    }
-    let __body = serde_json::Value::Object(__body_map);
-
-    Ok(sdk_request::<serde_json::Value>(
-        "PUT",
-        &format!(
-            "/v2/databases/{}/autoscale",
-            crate::client::encode_path_segment(&database_cluster_uuid)
-        ),
-        config,
-        RequestOpts {
-            body: Some(__body),
-            decoder: crate::client::ResponseDecoder::Empty,
-            operation_id: "databases_update_autoscale",
-            options,
-            errors: &[
-                ("401", "Error2"),
-                ("404", "Error2"),
-                ("422", "Error2"),
                 ("429", "Error2"),
                 ("500", "Error2"),
                 ("default", "Error2"),

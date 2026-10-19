@@ -104,6 +104,60 @@ impl<'de> serde::Deserialize<'de> for DropletActionsPost {
     }
 }
 
+impl ::std::convert::From<Box<DropletAction>> for DropletActionsPost {
+    fn from(value: Box<DropletAction>) -> Self {
+        Self::DropletAction(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionEnableBackupsRequest>> for DropletActionsPost {
+    fn from(value: Box<DropletActionEnableBackupsRequest>) -> Self {
+        Self::DropletActionEnableBackupsRequest(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionChangeBackupPolicy>> for DropletActionsPost {
+    fn from(value: Box<DropletActionChangeBackupPolicy>) -> Self {
+        Self::DropletActionChangeBackupPolicy(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionRestore>> for DropletActionsPost {
+    fn from(value: Box<DropletActionRestore>) -> Self {
+        Self::DropletActionRestore(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionResize>> for DropletActionsPost {
+    fn from(value: Box<DropletActionResize>) -> Self {
+        Self::DropletActionResize(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionRebuild>> for DropletActionsPost {
+    fn from(value: Box<DropletActionRebuild>) -> Self {
+        Self::DropletActionRebuild(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionRename>> for DropletActionsPost {
+    fn from(value: Box<DropletActionRename>) -> Self {
+        Self::DropletActionRename(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionChangeKernel>> for DropletActionsPost {
+    fn from(value: Box<DropletActionChangeKernel>) -> Self {
+        Self::DropletActionChangeKernel(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionSnapshot>> for DropletActionsPost {
+    fn from(value: Box<DropletActionSnapshot>) -> Self {
+        Self::DropletActionSnapshot(value)
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
 pub enum DropletActionsPostByTag {
@@ -132,6 +186,18 @@ impl<'de> serde::Deserialize<'de> for DropletActionsPostByTag {
         lossy.ok_or_else(|| {
             serde::de::Error::custom("no DropletActionsPostByTag branch accepts this payload")
         })
+    }
+}
+
+impl ::std::convert::From<Box<DropletAction>> for DropletActionsPostByTag {
+    fn from(value: Box<DropletAction>) -> Self {
+        Self::DropletAction(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletActionSnapshot>> for DropletActionsPostByTag {
+    fn from(value: Box<DropletActionSnapshot>) -> Self {
+        Self::DropletActionSnapshot(value)
     }
 }
 

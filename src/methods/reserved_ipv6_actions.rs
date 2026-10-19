@@ -38,6 +38,18 @@ impl<'de> serde::Deserialize<'de> for ReservedIPv6ActionsPost {
     }
 }
 
+impl ::std::convert::From<Box<ReservedIpv6ActionUnassign>> for ReservedIPv6ActionsPost {
+    fn from(value: Box<ReservedIpv6ActionUnassign>) -> Self {
+        Self::ReservedIpv6ActionUnassign(value)
+    }
+}
+
+impl ::std::convert::From<Box<ReservedIpv6ActionAssign>> for ReservedIPv6ActionsPost {
+    fn from(value: Box<ReservedIpv6ActionAssign>) -> Self {
+        Self::ReservedIpv6ActionAssign(value)
+    }
+}
+
 /// Triggers an action on a reserved IPv6 address to assign it to a Droplet or unassign it. Set `type` to `assign` or `unassign`, and include `droplet_id` when assigning the address. A 201 response returns the created action object.
 ///
 /// To initiate an action on a reserved IPv6 send a POST request to `/v2/reserved_ipv6/$RESERVED_IPV6/actions`. In the JSON body to the request, set the `type` attribute to on of the supported action types: | Action | Details |------------|-------- | `assign` | Assigns a reserved IPv6 to a Droplet | `unassign` | Unassign a reserved IPv6 from a Droplet
