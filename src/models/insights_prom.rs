@@ -308,6 +308,24 @@ impl<'de> serde::Deserialize<'de> for PromQueryDataResult {
     }
 }
 
+impl ::std::convert::From<Vec<PromVectorSample>> for PromQueryDataResult {
+    fn from(value: Vec<PromVectorSample>) -> Self {
+        Self::PromVectorSampleArray(value)
+    }
+}
+
+impl ::std::convert::From<Vec<PromMatrixSample>> for PromQueryDataResult {
+    fn from(value: Vec<PromMatrixSample>) -> Self {
+        Self::PromMatrixSampleArray(value)
+    }
+}
+
+impl ::std::convert::From<Box<PromSample>> for PromQueryDataResult {
+    fn from(value: Box<PromSample>) -> Self {
+        Self::PromSample(value)
+    }
+}
+
 /// Typed representation of the `PromQueryData` API schema.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PromQueryData {

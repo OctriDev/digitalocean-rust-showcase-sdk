@@ -27,6 +27,18 @@ impl<'de> serde::Deserialize<'de> for PromSampleItem {
     }
 }
 
+impl ::std::convert::From<f64> for PromSampleItem {
+    fn from(value: f64) -> Self {
+        Self::Number(value)
+    }
+}
+
+impl ::std::convert::From<String> for PromSampleItem {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
 pub type PromSample = Vec<PromSampleItem>;
 
 /// Required enumerated value serialized in the `status` wire field.

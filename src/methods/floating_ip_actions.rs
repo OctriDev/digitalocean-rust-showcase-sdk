@@ -40,6 +40,18 @@ impl<'de> serde::Deserialize<'de> for FloatingIPsActionPost {
     }
 }
 
+impl ::std::convert::From<Box<FloatingIpActionUnassign>> for FloatingIPsActionPost {
+    fn from(value: Box<FloatingIpActionUnassign>) -> Self {
+        Self::FloatingIpActionUnassign(value)
+    }
+}
+
+impl ::std::convert::From<Box<FloatingIpActionAssign>> for FloatingIPsActionPost {
+    fn from(value: Box<FloatingIpActionAssign>) -> Self {
+        Self::FloatingIpActionAssign(value)
+    }
+}
+
 /// To retrieve all actions that have been executed on a floating IP, send a GET request to `/v2/floating_ips/$FLOATING_IP/actions`.
 ///
 /// # Arguments

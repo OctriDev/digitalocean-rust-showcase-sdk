@@ -34,6 +34,18 @@ impl<'de> serde::Deserialize<'de> for EmbeddingsRequestInput {
     }
 }
 
+impl ::std::convert::From<String> for EmbeddingsRequestInput {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<Vec<String>> for EmbeddingsRequestInput {
+    fn from(value: Vec<String>) -> Self {
+        Self::StringArray(value)
+    }
+}
+
 /// How embedding values are returned in each `data[].embedding` field.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum EmbeddingsRequestEncodingFormatEnum {

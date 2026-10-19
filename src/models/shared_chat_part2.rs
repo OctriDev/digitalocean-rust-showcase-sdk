@@ -3,6 +3,16 @@
 
 // shared_chat domain models (part 2)
 
+/// Optional enumerated value serialized in the `tool_choice` wire field.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub enum ChatCompletionRequestToolChoiceVariant0Enum {
+    #[default]
+    None,
+    Auto,
+    Required,
+    Unknown(String),
+}
+
 impl ChatCompletionRequestToolChoiceVariant0Enum {
     pub fn as_str(&self) -> &str {
         match self {
@@ -490,14 +500,4 @@ impl ChatCompletionResponse {
             usage: None,
         }
     }
-}
-
-/// The role of the author of this message.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub enum ChatCompletionStreamResponseDeltaRoleEnum {
-    #[default]
-    Developer,
-    User,
-    Assistant,
-    Unknown(String),
 }

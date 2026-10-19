@@ -43,6 +43,18 @@ impl<'de> serde::Deserialize<'de> for DropletsCreate {
     }
 }
 
+impl ::std::convert::From<Box<DropletSingleCreateRequest>> for DropletsCreate {
+    fn from(value: Box<DropletSingleCreateRequest>) -> Self {
+        Self::DropletSingleCreateRequest(value)
+    }
+}
+
+impl ::std::convert::From<Box<DropletMultiCreate>> for DropletsCreate {
+    fn from(value: Box<DropletMultiCreate>) -> Self {
+        Self::DropletMultiCreate(value)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum DropletsListEnum {
     #[default]

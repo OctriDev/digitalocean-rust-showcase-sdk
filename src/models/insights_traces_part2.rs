@@ -3,6 +3,58 @@
 
 // insights_traces domain models (part 2)
 
+impl<'de> serde::Deserialize<'de> for TracesFilterValueVariant5TypeEnum {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let value = <String as serde::Deserialize>::deserialize(deserializer)?;
+        Ok(match value.as_str() {
+            "string_array" => Self::StringArray,
+            _ => Self::Unknown(value),
+        })
+    }
+}
+
+impl std::fmt::Display for TracesFilterValueVariant5TypeEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+/// A typed string list, used with the `in` operator.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct TracesFilterValueVariant5 {
+    /// Required enumerated value serialized in the `type` wire field.
+    #[serde(rename = "type")]
+    pub type_: TracesFilterValueVariant5TypeEnum,
+    /// Required array value serialized in the `value` wire field.
+    pub value: Vec<String>,
+}
+
+impl TracesFilterValueVariant5 {
+    pub(super) fn validate_constraints(&self) -> Result<(), crate::errors::SdkError> {
+        crate::validation::validate_items(
+            "value",
+            self.value.as_slice(),
+            crate::validation::LengthOpts {
+                min: Some(1),
+                max: Some(100),
+            },
+        )?;
+        Ok(())
+    }
+
+    pub fn new(
+        type_: TracesFilterValueVariant5TypeEnum,
+        value: Vec<String>,
+    ) -> Result<Self, crate::errors::SdkError> {
+        let value = Self { type_, value };
+        value.validate_constraints()?;
+        Ok(value)
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum TracesFilterValue {

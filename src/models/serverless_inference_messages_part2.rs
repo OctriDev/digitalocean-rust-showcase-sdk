@@ -3,6 +3,24 @@
 
 // serverless_inference_messages domain models (part 2)
 
+impl MessagesCreateResponseTypeEnum {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Message => "message",
+            Self::Unknown(value) => value.as_str(),
+        }
+    }
+}
+
+impl serde::Serialize for MessagesCreateResponseTypeEnum {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
 impl<'de> serde::Deserialize<'de> for MessagesCreateResponseTypeEnum {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -470,24 +488,5 @@ impl<'de> serde::Deserialize<'de> for MessagesStreamEventTypeEnum {
 impl std::fmt::Display for MessagesStreamEventTypeEnum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.as_str())
-    }
-}
-
-/// Optional enumerated value serialized in the `speed` wire field.
-#[derive(Debug, Clone, PartialEq, Default)]
-pub enum MessagesStreamEventUsageSpeedEnum {
-    #[default]
-    Standard,
-    Fast,
-    Unknown(String),
-}
-
-impl MessagesStreamEventUsageSpeedEnum {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Self::Standard => "standard",
-            Self::Fast => "fast",
-            Self::Unknown(value) => value.as_str(),
-        }
     }
 }

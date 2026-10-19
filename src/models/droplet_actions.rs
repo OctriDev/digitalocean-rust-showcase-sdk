@@ -258,6 +258,18 @@ impl<'de> serde::Deserialize<'de> for DropletActionRebuildVariant1Image {
     }
 }
 
+impl ::std::convert::From<String> for DropletActionRebuildVariant1Image {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl ::std::convert::From<i64> for DropletActionRebuildVariant1Image {
+    fn from(value: i64) -> Self {
+        Self::Integer(value)
+    }
+}
+
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct DropletActionRebuildVariant1 {
     /// The image ID of a public or private image or the slug identifier for a public image. The Droplet will be rebuilt using this image as its base.

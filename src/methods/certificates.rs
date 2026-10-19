@@ -43,6 +43,18 @@ impl<'de> serde::Deserialize<'de> for CertificatesCreate {
     }
 }
 
+impl ::std::convert::From<Box<CertificateRequestLetsEncrypt>> for CertificatesCreate {
+    fn from(value: Box<CertificateRequestLetsEncrypt>) -> Self {
+        Self::CertificateRequestLetsEncrypt(value)
+    }
+}
+
+impl ::std::convert::From<Box<CertificateRequestCustom>> for CertificatesCreate {
+    fn from(value: Box<CertificateRequestCustom>) -> Self {
+        Self::CertificateRequestCustom(value)
+    }
+}
+
 /// To list all of the certificates available on your account, send a GET request to `/v2/certificates`.
 ///
 /// # Arguments

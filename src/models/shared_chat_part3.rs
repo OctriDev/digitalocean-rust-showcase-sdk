@@ -3,6 +3,16 @@
 
 // shared_chat domain models (part 3)
 
+/// The role of the author of this message.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub enum ChatCompletionStreamResponseDeltaRoleEnum {
+    #[default]
+    Developer,
+    User,
+    Assistant,
+    Unknown(String),
+}
+
 impl ChatCompletionStreamResponseDeltaRoleEnum {
     pub fn as_str(&self) -> &str {
         match self {

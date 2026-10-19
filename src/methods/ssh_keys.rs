@@ -39,6 +39,18 @@ impl<'de> serde::Deserialize<'de> for SshKeysDelete {
     }
 }
 
+impl ::std::convert::From<Box<SshKeyId>> for SshKeysDelete {
+    fn from(value: Box<SshKeyId>) -> Self {
+        Self::SshKeyId(value)
+    }
+}
+
+impl ::std::convert::From<Box<SshKeyFingerprint>> for SshKeysDelete {
+    fn from(value: Box<SshKeyFingerprint>) -> Self {
+        Self::SshKeyFingerprint(value)
+    }
+}
+
 /// To list all of the keys in your account, send a GET request to `/v2/account/keys`. The response will be a JSON object with a key set to `ssh_keys`. The value of this will be an array of ssh_key objects, each of which contains the standard ssh_key attributes.
 ///
 /// # Arguments

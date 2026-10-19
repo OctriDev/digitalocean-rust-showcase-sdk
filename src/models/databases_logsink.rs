@@ -116,6 +116,30 @@ impl<'de> serde::Deserialize<'de> for LogsinkSchemaConfig {
     }
 }
 
+impl ::std::convert::From<Box<RsyslogLogsink>> for LogsinkSchemaConfig {
+    fn from(value: Box<RsyslogLogsink>) -> Self {
+        Self::RsyslogLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<ElasticsearchLogsink>> for LogsinkSchemaConfig {
+    fn from(value: Box<ElasticsearchLogsink>) -> Self {
+        Self::ElasticsearchLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<OpensearchLogsink>> for LogsinkSchemaConfig {
+    fn from(value: Box<OpensearchLogsink>) -> Self {
+        Self::OpensearchLogsink(value)
+    }
+}
+
+impl ::std::convert::From<Box<DatadogLogsink>> for LogsinkSchemaConfig {
+    fn from(value: Box<DatadogLogsink>) -> Self {
+        Self::DatadogLogsink(value)
+    }
+}
+
 /// Typed representation of the `LogsinkSchema` API schema.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LogsinkSchema {
