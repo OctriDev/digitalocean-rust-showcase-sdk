@@ -12,15 +12,21 @@ use crate::types::{
     VectordbUpdateVectorDBTagsResponse, VectordbVectorDBConfig,
 };
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesListParams {
+    pub page: Option<i64>,
+    pub per_page: Option<i64>,
+}
+
 /// Lists vector databases provisioned on your account. Use `page` and `per_page` to paginate the results. The response includes the `vector_dbs` array and the overall count in `total`.
 ///
 /// To list all of the vector databases on your account, send a GET request to `/v2/vector-databases`. Use the `page` and `per_page` query parameters to paginate the results. The response body contains a `vector_dbs` array of vector database objects and a `total` field with the overall count.
 pub fn vector_databases_list(
     config: &ClientConfig,
-    page: Option<i64>,
-    per_page: Option<i64>,
+    params: VectorDatabasesListParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbListVectorDBsResponse, SdkError> {
+    let VectorDatabasesListParams { page, per_page } = params;
     let mut __query: Vec<(&str, String)> = Vec::with_capacity(2);
     if let Some(ref v) = page {
         __query.push(("page", crate::client::query_value(v)));
@@ -162,6 +168,11 @@ pub fn vector_databases_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesGetParams {
+    pub id: String,
+}
+
 /// To show information about an existing vector database, send a GET request to `/v2/vector-databases/{id}`. The response body contains a JSON object with a `vector_db` key holding the standard vector database attributes, including an embedded `endpoints` object with the connection information needed to access the database.
 ///
 /// # Arguments
@@ -169,9 +180,10 @@ pub fn vector_databases_create(
 /// * `id` - ID of the vector database.
 pub fn vector_databases_get(
     config: &ClientConfig,
-    id: String,
+    params: VectorDatabasesGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbGetVectorDBResponse, SdkError> {
+    let VectorDatabasesGetParams { id } = params;
     Ok(sdk_request::<VectordbGetVectorDBResponse>(
         "GET",
         &format!(
@@ -196,6 +208,14 @@ pub fn vector_databases_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesUpdateParams {
+    pub id: String,
+    pub config: Option<VectordbVectorDBConfig>,
+    pub id_2: Option<String>,
+    pub project_id: Option<String>,
+}
+
 /// To update an existing vector database, send a PUT request to `/v2/vector-databases/{id}`. The response body contains a JSON object with a `vector_db` key holding the updated vector database.
 ///
 /// # Arguments
@@ -206,12 +226,15 @@ pub fn vector_databases_get(
 /// * `project_id` - Optional. New project UUID to assign the database to.
 pub fn vector_databases_update(
     config: &ClientConfig,
-    id: String,
-    config_2: Option<VectordbVectorDBConfig>,
-    id_2: Option<String>,
-    project_id: Option<String>,
+    params: VectorDatabasesUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbUpdateVectorDBResponse, SdkError> {
+    let VectorDatabasesUpdateParams {
+        id,
+        config: config_2,
+        id_2,
+        project_id,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = config_2 {
         __body_map.insert(
@@ -273,6 +296,11 @@ pub fn vector_databases_update(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesDeleteParams {
+    pub id: String,
+}
+
 /// To delete a vector database, send a DELETE request to `/v2/vector-databases/{id}`. Deleting a vector database is irreversible and destroys the underlying instance along with its data.
 ///
 /// # Arguments
@@ -280,9 +308,10 @@ pub fn vector_databases_update(
 /// * `id` - ID of the vector database.
 pub fn vector_databases_delete(
     config: &ClientConfig,
-    id: String,
+    params: VectorDatabasesDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let VectorDatabasesDeleteParams { id } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(
@@ -307,6 +336,11 @@ pub fn vector_databases_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesListBackupsParams {
+    pub id: String,
+}
+
 /// To list the available backups for a vector database, send a GET request to `/v2/vector-databases/{id}/backups`. Only backups with a status of `SUCCESS` are returned.
 ///
 /// # Arguments
@@ -314,9 +348,10 @@ pub fn vector_databases_delete(
 /// * `id` - Required. ID of the vector database.
 pub fn vector_databases_list_backups(
     config: &ClientConfig,
-    id: String,
+    params: VectorDatabasesListBackupsParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbListBackupsResponse, SdkError> {
+    let VectorDatabasesListBackupsParams { id } = params;
     Ok(sdk_request::<VectordbListBackupsResponse>(
         "GET",
         &format!(
@@ -341,6 +376,12 @@ pub fn vector_databases_list_backups(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesGetRestoreStatusParams {
+    pub id: String,
+    pub backup_id: String,
+}
+
 /// To check the status of a restore operation, send a GET request to `/v2/vector-databases/{id}/backups/{backup_id}/restore`. The response body contains the current status of the restore.
 ///
 /// # Arguments
@@ -349,10 +390,10 @@ pub fn vector_databases_list_backups(
 /// * `backup_id` - Required. ID of the backup being restored.
 pub fn vector_databases_get_restore_status(
     config: &ClientConfig,
-    id: String,
-    backup_id: String,
+    params: VectorDatabasesGetRestoreStatusParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbGetRestoreStatusResponse, SdkError> {
+    let VectorDatabasesGetRestoreStatusParams { id, backup_id } = params;
     Ok(sdk_request::<VectordbGetRestoreStatusResponse>(
         "GET",
         &format!(
@@ -378,6 +419,14 @@ pub fn vector_databases_get_restore_status(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesPostRestoreBackupParams {
+    pub id: String,
+    pub backup_id: String,
+    pub backup_id_2: Option<String>,
+    pub id_2: Option<String>,
+}
+
 /// To restore a vector database from a backup, send a POST request to `/v2/vector-databases/{id}/backups/{backup_id}/restore`. The restore runs asynchronously; use the restore-status endpoint to monitor its progress.
 ///
 /// # Arguments
@@ -388,12 +437,15 @@ pub fn vector_databases_get_restore_status(
 /// * `id_2` - Required. ID of the vector database.
 pub fn vector_databases_post_restore_backup(
     config: &ClientConfig,
-    id: String,
-    backup_id: String,
-    backup_id_2: Option<String>,
-    id_2: Option<String>,
+    params: VectorDatabasesPostRestoreBackupParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbRestoreBackupResponse, SdkError> {
+    let VectorDatabasesPostRestoreBackupParams {
+        id,
+        backup_id,
+        backup_id_2,
+        id_2,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = backup_id_2 {
         __body_map.insert(
@@ -445,6 +497,11 @@ pub fn vector_databases_post_restore_backup(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesGetCredentialsParams {
+    pub id: String,
+}
+
 /// To retrieve the admin credentials for a vector database, send a GET request to `/v2/vector-databases/{id}/credentials`. The response body contains the `user_id` and `api_token` for the admin user provisioned on the cluster.
 ///
 /// # Arguments
@@ -452,9 +509,10 @@ pub fn vector_databases_post_restore_backup(
 /// * `id` - ID of the vector database.
 pub fn vector_databases_get_credentials(
     config: &ClientConfig,
-    id: String,
+    params: VectorDatabasesGetCredentialsParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbGetVectorDBAdminCredentialsResponse, SdkError> {
+    let VectorDatabasesGetCredentialsParams { id } = params;
     Ok(sdk_request::<VectordbGetVectorDBAdminCredentialsResponse>(
         "GET",
         &format!(
@@ -479,6 +537,13 @@ pub fn vector_databases_get_credentials(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesPostResizeParams {
+    pub id: String,
+    pub id_2: Option<String>,
+    pub size: Option<String>,
+}
+
 /// To resize a vector database, send a POST request to `/v2/vector-databases/{id}/resize`. This changes the database's resource tier. The response body contains a JSON object with the updated vector database.
 ///
 /// # Arguments
@@ -488,11 +553,10 @@ pub fn vector_databases_get_credentials(
 /// * `size` - Required. Target resource tier: small, medium, or large.
 pub fn vector_databases_post_resize(
     config: &ClientConfig,
-    id: String,
-    id_2: Option<String>,
-    size: Option<String>,
+    params: VectorDatabasesPostResizeParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbResizeVectorDBResponse, SdkError> {
+    let VectorDatabasesPostResizeParams { id, id_2, size } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = id_2 {
         __body_map.insert(
@@ -543,6 +607,13 @@ pub fn vector_databases_post_resize(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VectorDatabasesUpdateTagsParams {
+    pub id: String,
+    pub id_2: Option<String>,
+    pub tags: Option<Vec<String>>,
+}
+
 /// To update the tags on a vector database, send a PUT request to `/v2/vector-databases/{id}/tags`. The supplied set of tags replaces the database's existing tags.
 ///
 /// # Arguments
@@ -552,11 +623,10 @@ pub fn vector_databases_post_resize(
 /// * `tags` - Tags to set on the vector database. Replaces all existing tags.
 pub fn vector_databases_update_tags(
     config: &ClientConfig,
-    id: String,
-    id_2: Option<String>,
-    tags: Option<Vec<String>>,
+    params: VectorDatabasesUpdateTagsParams,
     options: Option<&RequestOptions>,
 ) -> Result<VectordbUpdateVectorDBTagsResponse, SdkError> {
+    let VectorDatabasesUpdateTagsParams { id, id_2, tags } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = id_2 {
         __body_map.insert(

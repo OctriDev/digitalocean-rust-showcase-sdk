@@ -114,6 +114,12 @@ pub fn billing_history_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct InvoicesListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To retrieve a list of all invoices, send a GET request to `/v2/customers/my/invoices`.
 ///
 /// # Arguments
@@ -122,10 +128,10 @@ pub fn billing_history_list(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn invoices_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: InvoicesListParams,
     options: Option<&RequestOptions>,
 ) -> Result<Invoices, SdkError> {
+    let InvoicesListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -177,6 +183,13 @@ pub fn invoices_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct InvoicesGetByUuidParams {
+    pub invoice_uuid: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To retrieve the invoice items for an invoice, send a GET request to `/v2/customers/my/invoices/$INVOICE_UUID`.
 ///
 /// # Arguments
@@ -186,11 +199,14 @@ pub fn invoices_list(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn invoices_get_by_uuid(
     config: &ClientConfig,
-    invoice_uuid: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: InvoicesGetByUuidParams,
     options: Option<&RequestOptions>,
 ) -> Result<Invoice, SdkError> {
+    let InvoicesGetByUuidParams {
+        invoice_uuid,
+        per_page,
+        page,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -246,6 +262,11 @@ pub fn invoices_get_by_uuid(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct InvoicesGetCsvByUuidParams {
+    pub invoice_uuid: String,
+}
+
 /// To retrieve a CSV for an invoice, send a GET request to `/v2/customers/my/invoices/$INVOICE_UUID/csv`.
 ///
 /// # Arguments
@@ -253,9 +274,10 @@ pub fn invoices_get_by_uuid(
 /// * `invoice_uuid` - UUID of the invoice
 pub fn invoices_get_csv_by_uuid(
     config: &ClientConfig,
-    invoice_uuid: String,
+    params: InvoicesGetCsvByUuidParams,
     options: Option<&RequestOptions>,
 ) -> Result<String, SdkError> {
+    let InvoicesGetCsvByUuidParams { invoice_uuid } = params;
     Ok(sdk_request::<String>(
         "GET",
         &format!(
@@ -280,6 +302,11 @@ pub fn invoices_get_csv_by_uuid(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct InvoicesGetPdfByUuidParams {
+    pub invoice_uuid: String,
+}
+
 /// To retrieve a PDF for an invoice, send a GET request to `/v2/customers/my/invoices/$INVOICE_UUID/pdf`.
 ///
 /// # Arguments
@@ -287,9 +314,10 @@ pub fn invoices_get_csv_by_uuid(
 /// * `invoice_uuid` - UUID of the invoice
 pub fn invoices_get_pdf_by_uuid(
     config: &ClientConfig,
-    invoice_uuid: String,
+    params: InvoicesGetPdfByUuidParams,
     options: Option<&RequestOptions>,
 ) -> Result<Vec<u8>, SdkError> {
+    let InvoicesGetPdfByUuidParams { invoice_uuid } = params;
     Ok(sdk_request::<Vec<u8>>(
         "GET",
         &format!(
@@ -314,6 +342,11 @@ pub fn invoices_get_pdf_by_uuid(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct InvoicesGetSummaryByUuidParams {
+    pub invoice_uuid: String,
+}
+
 /// To retrieve a summary for an invoice, send a GET request to `/v2/customers/my/invoices/$INVOICE_UUID/summary`.
 ///
 /// # Arguments
@@ -321,9 +354,10 @@ pub fn invoices_get_pdf_by_uuid(
 /// * `invoice_uuid` - UUID of the invoice
 pub fn invoices_get_summary_by_uuid(
     config: &ClientConfig,
-    invoice_uuid: String,
+    params: InvoicesGetSummaryByUuidParams,
     options: Option<&RequestOptions>,
 ) -> Result<InvoiceSummary, SdkError> {
+    let InvoicesGetSummaryByUuidParams { invoice_uuid } = params;
     Ok(sdk_request::<InvoiceSummary>(
         "GET",
         &format!(

@@ -6,6 +6,12 @@ use crate::client::{sdk_request, RequestOptions, RequestOpts};
 use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{CreateTeamResponse, ListTeams, TeamInvitation};
 
+#[derive(Debug, Clone, Default)]
+pub struct OrganizationsCreateTeamParams {
+    pub name: String,
+    pub invitations: Option<Vec<TeamInvitation>>,
+}
+
 /// To create a new team within an organization, send a POST request to `/v2/organizations/team`. This endpoint must be called in an organization context. Optionally include `invitations` to invite users to the new team. The `owner` role cannot be assigned via invitation.
 ///
 /// # Arguments
@@ -16,10 +22,10 @@ use crate::types::{CreateTeamResponse, ListTeams, TeamInvitation};
 ///   assigned via invitation.
 pub fn organizations_create_team(
     config: &ClientConfig,
-    name: String,
-    invitations: Option<Vec<TeamInvitation>>,
+    params: OrganizationsCreateTeamParams,
     options: Option<&RequestOptions>,
 ) -> Result<CreateTeamResponse, SdkError> {
+    let OrganizationsCreateTeamParams { name, invitations } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "name".to_string(),

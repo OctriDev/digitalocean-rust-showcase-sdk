@@ -7,6 +7,12 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{ReservedIpCreate, ReservedIpCreated, ReservedIpList, ReservedIpResponse};
 use crate::validation::{validate_range, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the reserved IPs available on your account, send a GET request to `/v2/reserved_ips`.
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_range, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn reserved_ips_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: ReservedIpsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpList, SdkError> {
+    let ReservedIpsListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -70,14 +76,20 @@ pub fn reserved_ips_list(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct ReservedIpsCreateParams {
+    pub body: ReservedIpCreate,
+}
+
 /// Creates a reserved IP and either assigns it to a Droplet or reserves it to a region. Provide `droplet_id` for a Droplet assignment, or `region` to reserve the address to a region; `project_id` can optionally associate it with a project. When you assign the address during creation, the response includes links to the Droplet and the assignment action.
 ///
 /// On creation, a reserved IP must be either assigned to a Droplet or reserved to a region. \* To create a new reserved IP assigned to a Droplet, send a POST request to `/v2/reserved_ips` with the `droplet_id` attribute. \* To create a new reserved IP reserved to a region, send a POST request to `/v2/reserved_ips` with the `region` attribute.
 pub fn reserved_ips_create(
     config: &ClientConfig,
-    body: ReservedIpCreate,
+    params: ReservedIpsCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpCreated, SdkError> {
+    let ReservedIpsCreateParams { body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -106,6 +118,11 @@ pub fn reserved_ips_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpsGetParams {
+    pub reserved_ip: String,
+}
+
 /// To show information about a reserved IP, send a GET request to `/v2/reserved_ips/$RESERVED_IP_ADDR`.
 ///
 /// # Arguments
@@ -113,9 +130,10 @@ pub fn reserved_ips_create(
 /// * `reserved_ip` - A reserved IP address.
 pub fn reserved_ips_get(
     config: &ClientConfig,
-    reserved_ip: String,
+    params: ReservedIpsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpResponse, SdkError> {
+    let ReservedIpsGetParams { reserved_ip } = params;
     Ok(sdk_request::<ReservedIpResponse>(
         "GET",
         &format!(
@@ -140,6 +158,11 @@ pub fn reserved_ips_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpsDeleteParams {
+    pub reserved_ip: String,
+}
+
 /// To delete a reserved IP and remove it from your account, send a DELETE request to `/v2/reserved_ips/$RESERVED_IP_ADDR`. A successful request will receive a 204 status code with no body in response. This indicates that the request was processed successfully.
 ///
 /// # Arguments
@@ -147,9 +170,10 @@ pub fn reserved_ips_get(
 /// * `reserved_ip` - A reserved IP address.
 pub fn reserved_ips_delete(
     config: &ClientConfig,
-    reserved_ip: String,
+    params: ReservedIpsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let ReservedIpsDeleteParams { reserved_ip } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(

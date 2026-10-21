@@ -50,6 +50,11 @@ impl ::std::convert::From<Box<ImageActionTransfer>> for ImageActionsPost {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ImageActionsListParams {
+    pub image_id: i64,
+}
+
 /// To retrieve all actions that have been executed on an image, send a GET request to `/v2/images/$IMAGE_ID/actions`.
 ///
 /// # Arguments
@@ -58,9 +63,10 @@ impl ::std::convert::From<Box<ImageActionTransfer>> for ImageActionsPost {
 ///   specific image.
 pub fn image_actions_list(
     config: &ClientConfig,
-    image_id: i64,
+    params: ImageActionsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<GetImageActionsResponse, SdkError> {
+    let ImageActionsListParams { image_id } = params;
     Ok(sdk_request::<GetImageActionsResponse>(
         "GET",
         &format!(
@@ -85,6 +91,12 @@ pub fn image_actions_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ImageActionsPostParams {
+    pub image_id: i64,
+    pub body: Option<ImageActionsPost>,
+}
+
 /// Triggers an action on an image to convert it to a snapshot or transfer it to another region. Set `type` to `convert` or `transfer`, and provide `region` when transferring. The 201 response includes an action object you can use to track the action's status.
 ///
 /// The following actions are available on an Image. ## Convert an Image to a Snapshot To convert an image, for example, a backup to a snapshot, send a POST request to `/v2/images/$IMAGE_ID/actions`. Set the `type` attribute to `convert`. ## Transfer an Image To transfer an image to another region, send a POST request to `/v2/images/$IMAGE_ID/actions`. Set the `type` attribute to `transfer` and set `region` attribute to the slug identifier of the region you wish to transfer to.
@@ -95,10 +107,10 @@ pub fn image_actions_list(
 ///   specific image.
 pub fn image_actions_post(
     config: &ClientConfig,
-    image_id: i64,
-    body: Option<ImageActionsPost>,
+    params: ImageActionsPostParams,
     options: Option<&RequestOptions>,
 ) -> Result<Action, SdkError> {
+    let ImageActionsPostParams { image_id, body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -131,6 +143,12 @@ pub fn image_actions_post(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ImageActionsGetParams {
+    pub image_id: i64,
+    pub action_id: i64,
+}
+
 /// To retrieve the status of an image action, send a GET request to `/v2/images/$IMAGE_ID/actions/$IMAGE_ACTION_ID`.
 ///
 /// # Arguments
@@ -141,10 +159,13 @@ pub fn image_actions_post(
 ///   reference an action.
 pub fn image_actions_get(
     config: &ClientConfig,
-    image_id: i64,
-    action_id: i64,
+    params: ImageActionsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<Action, SdkError> {
+    let ImageActionsGetParams {
+        image_id,
+        action_id,
+    } = params;
     validate_range(
         "action_id",
         action_id as f64,

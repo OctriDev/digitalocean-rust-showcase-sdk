@@ -7,6 +7,12 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{AllCdnEndpoints, ExistingEndpoint};
 use crate::validation::{validate_range, validate_uuid, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct CdnListEndpointsParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the CDN endpoints available on your account, send a GET request to `/v2/cdn/endpoints`.
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_range, validate_uuid, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn cdn_list_endpoints(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: CdnListEndpointsParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllCdnEndpoints, SdkError> {
+    let CdnListEndpointsParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -70,6 +76,14 @@ pub fn cdn_list_endpoints(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CdnCreateEndpointParams {
+    pub origin: String,
+    pub ttl: Option<i64>,
+    pub certificate_id: Option<String>,
+    pub custom_domain: Option<String>,
+}
+
 /// To create a new CDN endpoint, send a POST request to `/v2/cdn/endpoints`. The origin attribute must be set to the fully qualified domain name (FQDN) of a DigitalOcean Space. Optionally, the TTL may be configured by setting the `ttl` attribute. A custom subdomain may be configured by specifying the `custom_domain` and `certificate_id` attributes.
 ///
 /// # Arguments
@@ -86,12 +100,15 @@ pub fn cdn_list_endpoints(
 ///   subdomain used with the CDN endpoint.
 pub fn cdn_create_endpoint(
     config: &ClientConfig,
-    origin: String,
-    ttl: Option<i64>,
-    certificate_id: Option<String>,
-    custom_domain: Option<String>,
+    params: CdnCreateEndpointParams,
     options: Option<&RequestOptions>,
 ) -> Result<ExistingEndpoint, SdkError> {
+    let CdnCreateEndpointParams {
+        origin,
+        ttl,
+        certificate_id,
+        custom_domain,
+    } = params;
     if let Some(ref certificate_id_v) = certificate_id {
         validate_uuid("certificate_id", certificate_id_v)?;
     }
@@ -162,6 +179,11 @@ pub fn cdn_create_endpoint(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CdnGetEndpointParams {
+    pub cdn_id: String,
+}
+
 /// To show information about an existing CDN endpoint, send a GET request to `/v2/cdn/endpoints/$ENDPOINT_ID`.
 ///
 /// # Arguments
@@ -169,9 +191,10 @@ pub fn cdn_create_endpoint(
 /// * `cdn_id` - A unique identifier for a CDN endpoint.
 pub fn cdn_get_endpoint(
     config: &ClientConfig,
-    cdn_id: String,
+    params: CdnGetEndpointParams,
     options: Option<&RequestOptions>,
 ) -> Result<ExistingEndpoint, SdkError> {
+    let CdnGetEndpointParams { cdn_id } = params;
     validate_uuid("cdn_id", &cdn_id)?;
 
     Ok(sdk_request::<ExistingEndpoint>(
@@ -198,6 +221,14 @@ pub fn cdn_get_endpoint(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CdnUpdateEndpointsParams {
+    pub cdn_id: String,
+    pub ttl: Option<i64>,
+    pub certificate_id: Option<String>,
+    pub custom_domain: Option<String>,
+}
+
 /// To update the TTL, certificate ID, or the FQDN of the custom subdomain for an existing CDN endpoint, send a PUT request to `/v2/cdn/endpoints/$ENDPOINT_ID`.
 ///
 /// # Arguments
@@ -212,12 +243,15 @@ pub fn cdn_get_endpoint(
 ///   subdomain used with the CDN endpoint.
 pub fn cdn_update_endpoints(
     config: &ClientConfig,
-    cdn_id: String,
-    ttl: Option<i64>,
-    certificate_id: Option<String>,
-    custom_domain: Option<String>,
+    params: CdnUpdateEndpointsParams,
     options: Option<&RequestOptions>,
 ) -> Result<ExistingEndpoint, SdkError> {
+    let CdnUpdateEndpointsParams {
+        cdn_id,
+        ttl,
+        certificate_id,
+        custom_domain,
+    } = params;
     validate_uuid("cdn_id", &cdn_id)?;
     if let Some(ref certificate_id_v) = certificate_id {
         validate_uuid("certificate_id", certificate_id_v)?;
@@ -284,6 +318,11 @@ pub fn cdn_update_endpoints(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CdnDeleteEndpointParams {
+    pub cdn_id: String,
+}
+
 /// To delete a specific CDN endpoint, send a DELETE request to `/v2/cdn/endpoints/$ENDPOINT_ID`. A status of 204 will be given. This indicates that the request was processed successfully, but that no response body is needed.
 ///
 /// # Arguments
@@ -291,9 +330,10 @@ pub fn cdn_update_endpoints(
 /// * `cdn_id` - A unique identifier for a CDN endpoint.
 pub fn cdn_delete_endpoint(
     config: &ClientConfig,
-    cdn_id: String,
+    params: CdnDeleteEndpointParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let CdnDeleteEndpointParams { cdn_id } = params;
     validate_uuid("cdn_id", &cdn_id)?;
 
     Ok(sdk_request::<serde_json::Value>(
@@ -320,6 +360,12 @@ pub fn cdn_delete_endpoint(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CdnPurgeCacheParams {
+    pub cdn_id: String,
+    pub files: Vec<String>,
+}
+
 /// To purge cached content from a CDN endpoint, send a DELETE request to `/v2/cdn/endpoints/$ENDPOINT_ID/cache`. The body of the request should include a `files` attribute containing a list of cached file paths to be purged. A path may be for a single file or may contain a wildcard (`\*`) to recursively purge all files under a directory. When only a wildcard is provided, all cached files will be purged. There is a rate limit of 50 files per 20 seconds that can be purged. CDN endpoints have a rate limit of 5 requests per 10 seconds. Purging files using a wildcard path counts as a single request against the API's rate limit. Two identical purge requests cannot be sent at the same time.
 ///
 /// # Arguments
@@ -329,10 +375,10 @@ pub fn cdn_delete_endpoint(
 ///   purged from the CDN cache.
 pub fn cdn_purge_cache(
     config: &ClientConfig,
-    cdn_id: String,
-    files: Vec<String>,
+    params: CdnPurgeCacheParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let CdnPurgeCacheParams { cdn_id, files } = params;
     validate_uuid("cdn_id", &cdn_id)?;
 
     let mut __body_map = serde_json::Map::new();

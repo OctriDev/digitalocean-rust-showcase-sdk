@@ -13,6 +13,12 @@ use crate::types::{
 };
 use crate::validation::{validate_items, validate_pattern, validate_range, LengthOpts, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct PartnerAttachmentsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the Partner Attachments on your account, send a `GET` request to `/v2/partner_network_connect/attachments`.
 ///
 /// # Arguments
@@ -21,10 +27,10 @@ use crate::validation::{validate_items, validate_pattern, validate_range, Length
 /// * `page` - Which 'page' of paginated results to return.
 pub fn partner_attachments_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: PartnerAttachmentsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllPartnerAttachments, SdkError> {
+    let PartnerAttachmentsListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -234,6 +240,11 @@ pub fn partner_attachments_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PartnerAttachmentsGetParams {
+    pub pa_id: String,
+}
+
 /// To get the details of a partner attachment, send a `GET` request to `/v2/partner_network_connect/attachments/{pa_id}`.
 ///
 /// # Arguments
@@ -241,9 +252,10 @@ pub fn partner_attachments_create(
 /// * `pa_id` - A unique identifier for a partner attachment.
 pub fn partner_attachments_get(
     config: &ClientConfig,
-    pa_id: String,
+    params: PartnerAttachmentsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<SinglePartnerAttachment, SdkError> {
+    let PartnerAttachmentsGetParams { pa_id } = params;
     Ok(sdk_request::<SinglePartnerAttachment>(
         "GET",
         &format!(
@@ -268,6 +280,12 @@ pub fn partner_attachments_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PartnerAttachmentsPatchParams {
+    pub pa_id: String,
+    pub body: Option<PartnerAttachmentUpdatable>,
+}
+
 /// Updates an existing partner attachment's name, attached VPC IDs, or BGP configuration. Supply the fields you want to change; attachment names may contain only letters, numbers, dashes, and periods, and `vpc_ids` must contain at least one ID. A 202 response returns attachment details, including attached VPC network IDs and BGP configuration information.
 ///
 /// To update an existing partner attachment, send a `PATCH` request to `/v2/partner_network_connect/attachments/{pa_id}` with a JSON object containing the fields to be updated.
@@ -277,10 +295,10 @@ pub fn partner_attachments_get(
 /// * `pa_id` - A unique identifier for a partner attachment.
 pub fn partner_attachments_patch(
     config: &ClientConfig,
-    pa_id: String,
-    body: Option<PartnerAttachmentUpdatable>,
+    params: PartnerAttachmentsPatchParams,
     options: Option<&RequestOptions>,
 ) -> Result<SinglePartnerAttachment, SdkError> {
+    let PartnerAttachmentsPatchParams { pa_id, body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -313,6 +331,11 @@ pub fn partner_attachments_patch(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PartnerAttachmentsDeleteParams {
+    pub pa_id: String,
+}
+
 /// To delete an existing partner attachment, send a `DELETE` request to `/v2/partner_network_connect/attachments/{pa_id}`.
 ///
 /// # Arguments
@@ -320,9 +343,10 @@ pub fn partner_attachments_patch(
 /// * `pa_id` - A unique identifier for a partner attachment.
 pub fn partner_attachments_delete(
     config: &ClientConfig,
-    pa_id: String,
+    params: PartnerAttachmentsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<SinglePartnerAttachmentDeleting, SdkError> {
+    let PartnerAttachmentsDeleteParams { pa_id } = params;
     Ok(sdk_request::<SinglePartnerAttachmentDeleting>(
         "DELETE",
         &format!(
@@ -347,6 +371,11 @@ pub fn partner_attachments_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PartnerAttachmentsGetBgpAuthKeyParams {
+    pub pa_id: String,
+}
+
 /// To get the current BGP auth key for a partner attachment, send a `GET` request to `/v2/partner_network_connect/attachments/{pa_id}/bgp_auth_key`.
 ///
 /// # Arguments
@@ -354,9 +383,10 @@ pub fn partner_attachments_delete(
 /// * `pa_id` - A unique identifier for a partner attachment.
 pub fn partner_attachments_get_bgp_auth_key(
     config: &ClientConfig,
-    pa_id: String,
+    params: PartnerAttachmentsGetBgpAuthKeyParams,
     options: Option<&RequestOptions>,
 ) -> Result<SinglePartnerAttachmentBgpAuthKey, SdkError> {
+    let PartnerAttachmentsGetBgpAuthKeyParams { pa_id } = params;
     Ok(sdk_request::<SinglePartnerAttachmentBgpAuthKey>(
         "GET",
         &format!(
@@ -381,6 +411,13 @@ pub fn partner_attachments_get_bgp_auth_key(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PartnerAttachmentsListRemoteRoutesParams {
+    pub pa_id: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all remote routes associated with a partner attachment, send a `GET` request to `/v2/partner_network_connect/attachments/{pa_id}/remote_routes`.
 ///
 /// # Arguments
@@ -390,11 +427,14 @@ pub fn partner_attachments_get_bgp_auth_key(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn partner_attachments_list_remote_routes(
     config: &ClientConfig,
-    pa_id: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: PartnerAttachmentsListRemoteRoutesParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllPartnerAttachmentRemoteRoutes, SdkError> {
+    let PartnerAttachmentsListRemoteRoutesParams {
+        pa_id,
+        per_page,
+        page,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -450,6 +490,11 @@ pub fn partner_attachments_list_remote_routes(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PartnerAttachmentsGetServiceKeyParams {
+    pub pa_id: String,
+}
+
 /// To get the current service key for a partner attachment, send a `GET` request to `/v2/partner_network_connect/attachments/{pa_id}/service_key`.
 ///
 /// # Arguments
@@ -457,9 +502,10 @@ pub fn partner_attachments_list_remote_routes(
 /// * `pa_id` - A unique identifier for a partner attachment.
 pub fn partner_attachments_get_service_key(
     config: &ClientConfig,
-    pa_id: String,
+    params: PartnerAttachmentsGetServiceKeyParams,
     options: Option<&RequestOptions>,
 ) -> Result<SinglePartnerAttachmentServiceKey, SdkError> {
+    let PartnerAttachmentsGetServiceKeyParams { pa_id } = params;
     Ok(sdk_request::<SinglePartnerAttachmentServiceKey>(
         "GET",
         &format!(
@@ -484,6 +530,11 @@ pub fn partner_attachments_get_service_key(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PartnerAttachmentsCreateServiceKeyParams {
+    pub pa_id: String,
+}
+
 /// This operation generates a new service key for the specified partner attachment. The operation is asynchronous, and the response is an empty JSON object returned with a 202 status code. To poll for the new service key, send a `GET` request to `/v2/partner_network_connect/attachments/{pa_id}/service_key`.
 ///
 /// # Arguments
@@ -491,9 +542,10 @@ pub fn partner_attachments_get_service_key(
 /// * `pa_id` - A unique identifier for a partner attachment.
 pub fn partner_attachments_create_service_key(
     config: &ClientConfig,
-    pa_id: String,
+    params: PartnerAttachmentsCreateServiceKeyParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let PartnerAttachmentsCreateServiceKeyParams { pa_id } = params;
     Ok(sdk_request::<serde_json::Value>(
         "POST",
         &format!(

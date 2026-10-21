@@ -7,6 +7,12 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{ReservedIPv6ListResponse, ReservedIpv6CreateResponse, ReservedIpv6Response};
 use crate::validation::{validate_range, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpv6ListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the reserved IPv6s available on your account, send a GET request to `/v2/reserved_ipv6`.
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_range, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn reserved_ipv6_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: ReservedIpv6ListParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIPv6ListResponse, SdkError> {
+    let ReservedIpv6ListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -70,6 +76,11 @@ pub fn reserved_ipv6_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpv6CreateParams {
+    pub region_slug: String,
+}
+
 /// On creation, a reserved IPv6 must be reserved to a region. \* To create a new reserved IPv6 reserved to a region, send a POST request to `/v2/reserved_ipv6` with the `region_slug` attribute.
 ///
 /// # Arguments
@@ -78,9 +89,10 @@ pub fn reserved_ipv6_list(
 ///   be reserved to.
 pub fn reserved_ipv6_create(
     config: &ClientConfig,
-    region_slug: String,
+    params: ReservedIpv6CreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpv6CreateResponse, SdkError> {
+    let ReservedIpv6CreateParams { region_slug } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "region_slug".to_string(),
@@ -114,6 +126,11 @@ pub fn reserved_ipv6_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpv6GetParams {
+    pub reserved_ipv6: String,
+}
+
 /// To show information about a reserved IPv6, send a GET request to `/v2/reserved_ipv6/$RESERVED_IPV6`.
 ///
 /// # Arguments
@@ -121,9 +138,10 @@ pub fn reserved_ipv6_create(
 /// * `reserved_ipv6` - A reserved IPv6 address.
 pub fn reserved_ipv6_get(
     config: &ClientConfig,
-    reserved_ipv6: String,
+    params: ReservedIpv6GetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpv6Response, SdkError> {
+    let ReservedIpv6GetParams { reserved_ipv6 } = params;
     Ok(sdk_request::<ReservedIpv6Response>(
         "GET",
         &format!(
@@ -148,6 +166,11 @@ pub fn reserved_ipv6_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpv6DeleteParams {
+    pub reserved_ipv6: String,
+}
+
 /// To delete a reserved IP and remove it from your account, send a DELETE request to `/v2/reserved_ipv6/$RESERVED_IPV6`. A successful request will receive a 204 status code with no body in response. This indicates that the request was processed successfully.
 ///
 /// # Arguments
@@ -155,9 +178,10 @@ pub fn reserved_ipv6_get(
 /// * `reserved_ipv6` - A reserved IPv6 address.
 pub fn reserved_ipv6_delete(
     config: &ClientConfig,
-    reserved_ipv6: String,
+    params: ReservedIpv6DeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let ReservedIpv6DeleteParams { reserved_ipv6 } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(

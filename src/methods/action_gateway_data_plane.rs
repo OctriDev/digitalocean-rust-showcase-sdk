@@ -11,6 +11,14 @@ use crate::types::{
 };
 use crate::validation::{validate_items, validate_range, validate_uuid, LengthOpts, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct GatewayToolsListParams {
+    pub x_session_id: String,
+    pub page_size: Option<i64>,
+    pub page_token: Option<String>,
+    pub if_none_match: Option<String>,
+}
+
 /// Lists the catalog tools that a session can call, ordered by name. The list applies the session's `tools` selection and omits tools that its policy always denies. Each page includes an `ETag` header. Send it in `If-None-Match` to receive `304 Not Modified` while the page is unchanged.
 ///
 /// # Arguments
@@ -26,12 +34,15 @@ use crate::validation::{validate_items, validate_range, validate_uuid, LengthOpt
 ///   If the page is unchanged, the response is `304 Not Modified` with no body.
 pub fn gateway_tools_list(
     config: &ClientConfig,
-    x_session_id: String,
-    page_size: Option<i64>,
-    page_token: Option<String>,
-    if_none_match: Option<String>,
+    params: GatewayToolsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<ListSessionToolsResponse, SdkError> {
+    let GatewayToolsListParams {
+        x_session_id,
+        page_size,
+        page_token,
+        if_none_match,
+    } = params;
     validate_uuid("X-Session-Id", &x_session_id)?;
     if let Some(ref page_size_v) = page_size {
         validate_range(
@@ -105,21 +116,27 @@ pub fn gateway_tools_list(
 ///   If the page is unchanged, the response is `304 Not Modified` with no body.
 pub fn gateway_tools_list_paginated(
     config: &ClientConfig,
-    x_session_id: String,
-    page_size: Option<i64>,
-    page_token: Option<String>,
-    if_none_match: Option<String>,
+    params: GatewayToolsListParams,
     options: Option<&RequestOptions>,
     mut yield_fn: impl FnMut(&SessionTool) -> bool,
 ) -> Result<(), SdkError> {
+    let GatewayToolsListParams {
+        x_session_id,
+        page_size,
+        page_token,
+        if_none_match,
+    } = params;
+
     let mut _cursor: Option<String> = page_token;
     loop {
         let _page = gateway_tools_list(
             config,
-            x_session_id.clone(),
-            page_size,
-            _cursor,
-            if_none_match.clone(),
+            GatewayToolsListParams {
+                x_session_id: x_session_id.clone(),
+                page_size,
+                page_token: _cursor,
+                if_none_match: if_none_match.clone(),
+            },
             options,
         )?;
         let _items: Vec<_> = _page.tools.iter().flatten().collect();
@@ -147,21 +164,27 @@ pub struct GatewayToolsListPage<'a> {
 
 pub fn gateway_tools_list_pages(
     config: &ClientConfig,
-    x_session_id: String,
-    page_size: Option<i64>,
-    page_token: Option<String>,
-    if_none_match: Option<String>,
+    params: GatewayToolsListParams,
     options: Option<&RequestOptions>,
     mut yield_page: impl FnMut(GatewayToolsListPage<'_>) -> bool,
 ) -> Result<(), SdkError> {
+    let GatewayToolsListParams {
+        x_session_id,
+        page_size,
+        page_token,
+        if_none_match,
+    } = params;
+
     let mut _cursor: Option<String> = page_token;
     loop {
         let _page = gateway_tools_list(
             config,
-            x_session_id.clone(),
-            page_size,
-            _cursor,
-            if_none_match.clone(),
+            GatewayToolsListParams {
+                x_session_id: x_session_id.clone(),
+                page_size,
+                page_token: _cursor,
+                if_none_match: if_none_match.clone(),
+            },
             options,
         )?;
         let _items: Vec<_> = _page.tools.iter().flatten().collect();
@@ -319,6 +342,13 @@ pub fn gateway_tools_list_search(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct GatewayToolsRunParams {
+    pub x_session_id: String,
+    pub tools: Vec<ToolCall>,
+    pub rationale: Option<String>,
+}
+
 /// Runs 1 to 10 tool calls in parallel and returns one result per call, in request order. This is the REST form of the `action_invoke` MCP tool. Each call is checked against the session's tool selection and policy, uses the session actor's connections, and applies any output view bound to the tool in the session. A well-formed request returns `200` even when some calls fail. Check each item's `result.status`, and use `success_count` and `error_count` to branch without scanning every item. A call whose policy requires approval fails with `_meta.status` set to `requires_approval`. Have the session's owner approve it, then repeat the call with the same arguments. A call that needs the end user to connect a provider fails with `_meta.status` set to `requires_authorization` or `requires_connection_configuration`.
 ///
 /// # Arguments
@@ -331,11 +361,14 @@ pub fn gateway_tools_list_search(
 ///   Values longer than 512 characters are truncated.
 pub fn gateway_tools_run(
     config: &ClientConfig,
-    x_session_id: String,
-    tools: Vec<ToolCall>,
-    rationale: Option<String>,
+    params: GatewayToolsRunParams,
     options: Option<&RequestOptions>,
 ) -> Result<InvokeToolsResponse, SdkError> {
+    let GatewayToolsRunParams {
+        x_session_id,
+        tools,
+        rationale,
+    } = params;
     validate_uuid("X-Session-Id", &x_session_id)?;
     validate_items(
         "tools",
@@ -402,6 +435,12 @@ pub fn gateway_tools_run(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct GatewayCodeRunParams {
+    pub x_session_id: String,
+    pub code: String,
+}
+
 /// Runs Python code in an ephemeral sandbox and returns its `stdout`, `stderr`, and `exit_code`. This is the REST form of the `action_code` MCP tool. Use it for computation, parsing, and data processing, or to chain several catalog tools in one request. The sandbox provides `invoke_digitalocean_tool(name, arguments)`, which calls a catalog tool and returns a tool result. Those calls follow the session's tool selection and policy. Each request runs in a fresh sandbox, so state is not kept between requests. Execution, including tool calls, is time limited. Code that runs too long fails with a `timeout` error. A nonzero exit code is still a `succeeded` result; check `output.exit_code`. If the session policy requires approval for `action_code`, the response is a failed result with `_meta.status` set to `requires_approval`.
 ///
 /// # Arguments
@@ -414,10 +453,10 @@ pub fn gateway_tools_run(
 ///   a catalog tool under the session's policy and returns a tool result.
 pub fn gateway_code_run(
     config: &ClientConfig,
-    x_session_id: String,
-    code: String,
+    params: GatewayCodeRunParams,
     options: Option<&RequestOptions>,
 ) -> Result<ExecuteCodeResponse, SdkError> {
+    let GatewayCodeRunParams { x_session_id, code } = params;
     validate_uuid("X-Session-Id", &x_session_id)?;
 
     let mut __headers: Vec<(String, String)> = Vec::with_capacity(1);
@@ -465,6 +504,13 @@ pub fn gateway_code_run(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct GatewaySessionApprovalsUpdateParams {
+    pub session_id: String,
+    pub approval_id: String,
+    pub decision: ApprovalDecisionDecisionEnum,
+}
+
 /// Approves or denies a tool call that is waiting for approval. A tool result returns `_meta.status` set to `requires_approval` when the session policy sets `ask` for the call, and its `_meta.decide` gives this request's path. Send the decision with the session owner's token. Approval is a separate control request, not a tool, so an agent cannot approve its own calls. After approving, repeat the original call with the same arguments before `expires_at`. An approval applies only to that session, tool version, and set of arguments, and is used once. To ask again after a denial or expiry, repeat the tool call.
 ///
 /// # Arguments
@@ -477,11 +523,14 @@ pub fn gateway_code_run(
 /// * `decision` - Whether to let the pending call run.
 pub fn gateway_session_approvals_update(
     config: &ClientConfig,
-    session_id: String,
-    approval_id: String,
-    decision: ApprovalDecisionDecisionEnum,
+    params: GatewaySessionApprovalsUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<ApprovalDecisionResponse, SdkError> {
+    let GatewaySessionApprovalsUpdateParams {
+        session_id,
+        approval_id,
+        decision,
+    } = params;
     validate_uuid("session_id", &session_id)?;
     validate_uuid("approval_id", &approval_id)?;
 
@@ -527,6 +576,13 @@ pub fn gateway_session_approvals_update(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct GatewayApprovalsUpdateParams {
+    pub approval_id: String,
+    pub x_session_id: String,
+    pub decision: ApprovalDecisionDecisionEnum,
+}
+
 /// Approves or denies a tool call that is waiting for approval, identifying the session with the `X-Session-Id` header. It behaves the same as `POST /approvals/session/{session_id}/{approval_id}`, which is the path returned in a result's `_meta.decide`.
 ///
 /// # Arguments
@@ -539,11 +595,14 @@ pub fn gateway_session_approvals_update(
 /// * `decision` - Whether to let the pending call run.
 pub fn gateway_approvals_update(
     config: &ClientConfig,
-    approval_id: String,
-    x_session_id: String,
-    decision: ApprovalDecisionDecisionEnum,
+    params: GatewayApprovalsUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<ApprovalDecisionResponse, SdkError> {
+    let GatewayApprovalsUpdateParams {
+        approval_id,
+        x_session_id,
+        decision,
+    } = params;
     validate_uuid("approval_id", &approval_id)?;
     validate_uuid("X-Session-Id", &x_session_id)?;
 

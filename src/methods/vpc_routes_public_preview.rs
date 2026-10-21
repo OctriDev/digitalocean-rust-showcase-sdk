@@ -7,6 +7,13 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{AllVpcRoutes, AllVpcSubnetRoutes, SingleRoute};
 use crate::validation::{validate_range, validate_uuid, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcRoutesListParams {
+    pub vpc_uuid: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list the read-only VPC-scoped routes for a VPC, send a GET request to `/v2/vpcs/$VPC_UUID/routes`. VPC-scoped routes cannot be created, updated, or deleted through the public API.
 ///
 /// # Arguments
@@ -16,11 +23,14 @@ use crate::validation::{validate_range, validate_uuid, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn vpc_routes_list(
     config: &ClientConfig,
-    vpc_uuid: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VpcRoutesListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllVpcRoutes, SdkError> {
+    let VpcRoutesListParams {
+        vpc_uuid,
+        per_page,
+        page,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     if let Some(ref per_page_v) = per_page {
         validate_range(
@@ -77,6 +87,14 @@ pub fn vpc_routes_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetRoutesListParams {
+    pub vpc_uuid: String,
+    pub subnet_uuid: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list routes for a VPC subnet, send a GET request to `/v2/vpcs/$VPC_UUID/subnets/$SUBNET_UUID/routes`. The response includes VPC-scoped routes propagated into the subnet and subnet-scoped routes.
 ///
 /// # Arguments
@@ -87,12 +105,15 @@ pub fn vpc_routes_list(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn vpc_subnet_routes_list(
     config: &ClientConfig,
-    vpc_uuid: String,
-    subnet_uuid: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VpcSubnetRoutesListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllVpcSubnetRoutes, SdkError> {
+    let VpcSubnetRoutesListParams {
+        vpc_uuid,
+        subnet_uuid,
+        per_page,
+        page,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     validate_uuid("subnet_uuid", &subnet_uuid)?;
     if let Some(ref per_page_v) = per_page {
@@ -151,6 +172,14 @@ pub fn vpc_subnet_routes_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetRoutesCreateParams {
+    pub vpc_uuid: String,
+    pub subnet_uuid: String,
+    pub destination_cidr: String,
+    pub target_urns: Vec<String>,
+}
+
 /// To add a static route to a VPC subnet, send a POST request to `/v2/vpcs/$VPC_UUID/subnets/$SUBNET_UUID/routes`. This route is additional to the routes the VPC already propagates to the subnet. The server assigns the route's `id` and `type`. Droplet targets must use a numeric ID. A Droplet UUID or another invalid `target_urns` value returns a 422 response.
 ///
 /// # Arguments
@@ -164,12 +193,15 @@ pub fn vpc_subnet_routes_list(
 ///   targets use a UUID in the format `do:nat_gateway:<uuid\>`.
 pub fn vpc_subnet_routes_create(
     config: &ClientConfig,
-    vpc_uuid: String,
-    subnet_uuid: String,
-    destination_cidr: String,
-    target_urns: Vec<String>,
+    params: VpcSubnetRoutesCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<SingleRoute, SdkError> {
+    let VpcSubnetRoutesCreateParams {
+        vpc_uuid,
+        subnet_uuid,
+        destination_cidr,
+        target_urns,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     validate_uuid("subnet_uuid", &subnet_uuid)?;
 
@@ -222,6 +254,14 @@ pub fn vpc_subnet_routes_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetRoutesUpdateParams {
+    pub vpc_uuid: String,
+    pub subnet_uuid: String,
+    pub route_uuid: String,
+    pub target_urns: Vec<String>,
+}
+
 /// To update the next hop for a user-defined VPC subnet route, send a PATCH request to `/v2/vpcs/$VPC_UUID/subnets/$SUBNET_UUID/routes/$ROUTE_UUID`. The `destination_cidr` cannot be changed. Droplet targets must use a numeric ID. A Droplet UUID or another invalid `target_urns` value returns a 422 response.
 ///
 /// # Arguments
@@ -234,12 +274,15 @@ pub fn vpc_subnet_routes_create(
 ///   targets use a UUID in the format `do:nat_gateway:<uuid\>`.
 pub fn vpc_subnet_routes_update(
     config: &ClientConfig,
-    vpc_uuid: String,
-    subnet_uuid: String,
-    route_uuid: String,
-    target_urns: Vec<String>,
+    params: VpcSubnetRoutesUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<SingleRoute, SdkError> {
+    let VpcSubnetRoutesUpdateParams {
+        vpc_uuid,
+        subnet_uuid,
+        route_uuid,
+        target_urns,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     validate_uuid("subnet_uuid", &subnet_uuid)?;
     validate_uuid("route_uuid", &route_uuid)?;
@@ -285,6 +328,13 @@ pub fn vpc_subnet_routes_update(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetRoutesDeleteParams {
+    pub vpc_uuid: String,
+    pub subnet_uuid: String,
+    pub route_uuid: String,
+}
+
 /// To delete a user-defined VPC subnet route, send a DELETE request to `/v2/vpcs/$VPC_UUID/subnets/$SUBNET_UUID/routes/$ROUTE_UUID`. Managed routes cannot be deleted. A successful request returns a 204 status code with no response body.
 ///
 /// # Arguments
@@ -294,11 +344,14 @@ pub fn vpc_subnet_routes_update(
 /// * `route_uuid` - The unique identifier of the route.
 pub fn vpc_subnet_routes_delete(
     config: &ClientConfig,
-    vpc_uuid: String,
-    subnet_uuid: String,
-    route_uuid: String,
+    params: VpcSubnetRoutesDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let VpcSubnetRoutesDeleteParams {
+        vpc_uuid,
+        subnet_uuid,
+        route_uuid,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     validate_uuid("subnet_uuid", &subnet_uuid)?;
     validate_uuid("route_uuid", &route_uuid)?;

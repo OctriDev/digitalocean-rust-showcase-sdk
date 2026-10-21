@@ -7,6 +7,12 @@ use crate::errors::SdkError;
 use crate::types::{ActionResponse, Actions};
 use crate::validation::{validate_range, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct ActionsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// This will be the entire list of actions taken on your account, so it will be quite large. As with any large collection returned by the API, the results will be paginated with only 20 on each page by default.
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_range, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn actions_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: ActionsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<Actions, SdkError> {
+    let ActionsListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -70,6 +76,11 @@ pub fn actions_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ActionsGetParams {
+    pub action_id: i64,
+}
+
 /// To retrieve a specific action object, send a GET request to `/v2/actions/$ACTION_ID`.
 ///
 /// # Arguments
@@ -78,9 +89,10 @@ pub fn actions_list(
 ///   reference an action.
 pub fn actions_get(
     config: &ClientConfig,
-    action_id: i64,
+    params: ActionsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ActionResponse, SdkError> {
+    let ActionsGetParams { action_id } = params;
     validate_range(
         "action_id",
         action_id as f64,

@@ -10,6 +10,13 @@ use crate::types::{
 };
 use crate::validation::{validate_range, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct AutoscalepoolsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+    pub name: Option<String>,
+}
+
 /// To list all autoscale pools in your team, send a GET request to `/v2/droplets/autoscale`. The response body will be a JSON object with a key of `autoscale_pools` containing an array of autoscale pool objects. These each contain the standard autoscale pool attributes.
 ///
 /// # Arguments
@@ -19,11 +26,14 @@ use crate::validation::{validate_range, RangeOpts};
 /// * `name` - The name of the autoscale pool
 pub fn autoscalepools_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
-    name: Option<String>,
+    params: AutoscalepoolsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllAutoscalePools, SdkError> {
+    let AutoscalepoolsListParams {
+        per_page,
+        page,
+        name,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -78,6 +88,13 @@ pub fn autoscalepools_list(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct AutoscalepoolsCreateParams {
+    pub name: String,
+    pub config: AutoscalePoolCreateConfig,
+    pub droplet_template: AutoscalePoolDropletTemplate,
+}
+
 /// Creates a new autoscale pool with a scaling configuration and a template for the Droplets it manages. Supply `name`, `config`, and `droplet_template`; the template must specify `region`, `image`, `size`, and `ssh_keys`. A 202 response returns the pool details, including its identifier and status.
 ///
 /// To create a new autoscale pool, send a POST request to `/v2/droplets/autoscale` setting the required attributes. The response body will contain a JSON object with a key called `autoscale_pool` containing the standard attributes for the new autoscale pool.
@@ -93,11 +110,14 @@ pub fn autoscalepools_list(
 ///   `droplet_template` wire field.
 pub fn autoscalepools_create(
     config: &ClientConfig,
-    name: String,
-    config_2: AutoscalePoolCreateConfig,
-    droplet_template: AutoscalePoolDropletTemplate,
+    params: AutoscalepoolsCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<AutoscalePoolCreateResponse, SdkError> {
+    let AutoscalepoolsCreateParams {
+        name,
+        config: config_2,
+        droplet_template,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "name".to_string(),
@@ -149,6 +169,11 @@ pub fn autoscalepools_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AutoscalepoolsGetParams {
+    pub autoscale_pool_id: String,
+}
+
 /// To show information about an individual autoscale pool, send a GET request to `/v2/droplets/autoscale/$AUTOSCALE_POOL_ID`.
 ///
 /// # Arguments
@@ -156,9 +181,10 @@ pub fn autoscalepools_create(
 /// * `autoscale_pool_id` - A unique identifier for an autoscale pool.
 pub fn autoscalepools_get(
     config: &ClientConfig,
-    autoscale_pool_id: String,
+    params: AutoscalepoolsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ExistingAutoscalePool, SdkError> {
+    let AutoscalepoolsGetParams { autoscale_pool_id } = params;
     Ok(sdk_request::<ExistingAutoscalePool>(
         "GET",
         &format!(
@@ -183,6 +209,14 @@ pub fn autoscalepools_get(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct AutoscalepoolsUpdateParams {
+    pub autoscale_pool_id: String,
+    pub name: String,
+    pub config: AutoscalePoolCreateConfig,
+    pub droplet_template: AutoscalePoolDropletTemplate,
+}
+
 /// Replaces the configuration of an existing autoscale pool with the full representation supplied in the request. Include `name`, `config`, and `droplet_template`, and provide the required region, image, size, and SSH keys in the Droplet template. A 200 response returns the updated pool details.
 ///
 /// To update the configuration of an existing autoscale pool, send a PUT request to `/v2/droplets/autoscale/$AUTOSCALE_POOL_ID`. The request must contain a full representation of the autoscale pool including existing attributes.
@@ -199,12 +233,15 @@ pub fn autoscalepools_get(
 ///   `droplet_template` wire field.
 pub fn autoscalepools_update(
     config: &ClientConfig,
-    autoscale_pool_id: String,
-    name: String,
-    config_2: AutoscalePoolCreateConfig,
-    droplet_template: AutoscalePoolDropletTemplate,
+    params: AutoscalepoolsUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<AutoscalePoolCreateResponse, SdkError> {
+    let AutoscalepoolsUpdateParams {
+        autoscale_pool_id,
+        name,
+        config: config_2,
+        droplet_template,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "name".to_string(),
@@ -260,6 +297,11 @@ pub fn autoscalepools_update(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AutoscalepoolsDeleteParams {
+    pub autoscale_pool_id: String,
+}
+
 /// To destroy an autoscale pool, send a DELETE request to the `/v2/droplets/autoscale/$AUTOSCALE_POOL_ID` endpoint. A successful response will include a 202 response code and no content.
 ///
 /// # Arguments
@@ -267,9 +309,10 @@ pub fn autoscalepools_update(
 /// * `autoscale_pool_id` - A unique identifier for an autoscale pool.
 pub fn autoscalepools_delete(
     config: &ClientConfig,
-    autoscale_pool_id: String,
+    params: AutoscalepoolsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let AutoscalepoolsDeleteParams { autoscale_pool_id } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(
@@ -294,6 +337,12 @@ pub fn autoscalepools_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AutoscalepoolsDeleteDangerousParams {
+    pub autoscale_pool_id: String,
+    pub x_dangerous: bool,
+}
+
 /// To destroy an autoscale pool and its associated resources (Droplets), send a DELETE request to the `/v2/droplets/autoscale/$AUTOSCALE_POOL_ID/dangerous` endpoint.
 ///
 /// # Arguments
@@ -303,10 +352,13 @@ pub fn autoscalepools_delete(
 ///   and its associated resources and _can not_ be reversed.
 pub fn autoscalepools_delete_dangerous(
     config: &ClientConfig,
-    autoscale_pool_id: String,
-    x_dangerous: bool,
+    params: AutoscalepoolsDeleteDangerousParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let AutoscalepoolsDeleteDangerousParams {
+        autoscale_pool_id,
+        x_dangerous,
+    } = params;
     let mut __headers: Vec<(String, String)> = Vec::with_capacity(1);
     __headers.extend([(
         "X-Dangerous".to_string(),
@@ -338,6 +390,13 @@ pub fn autoscalepools_delete_dangerous(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AutoscalepoolsListMembersParams {
+    pub autoscale_pool_id: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list the Droplets in an autoscale pool, send a GET request to `/v2/droplets/autoscale/$AUTOSCALE_POOL_ID/members`. The response body will be a JSON object with a key of `droplets`. This will be set to an array containing information about each of the Droplets in the autoscale pool.
 ///
 /// # Arguments
@@ -347,11 +406,14 @@ pub fn autoscalepools_delete_dangerous(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn autoscalepools_list_members(
     config: &ClientConfig,
-    autoscale_pool_id: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: AutoscalepoolsListMembersParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllMembers, SdkError> {
+    let AutoscalepoolsListMembersParams {
+        autoscale_pool_id,
+        per_page,
+        page,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -407,6 +469,13 @@ pub fn autoscalepools_list_members(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AutoscalepoolsListHistoryParams {
+    pub autoscale_pool_id: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the scaling history events of an autoscale pool, send a GET request to `/v2/droplets/autoscale/$AUTOSCALE_POOL_ID/history`. The response body will be a JSON object with a key of `history`. This will be set to an array containing objects each representing a history event.
 ///
 /// # Arguments
@@ -416,11 +485,14 @@ pub fn autoscalepools_list_members(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn autoscalepools_list_history(
     config: &ClientConfig,
-    autoscale_pool_id: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: AutoscalepoolsListHistoryParams,
     options: Option<&RequestOptions>,
 ) -> Result<HistoryEvents, SdkError> {
+    let AutoscalepoolsListHistoryParams {
+        autoscale_pool_id,
+        per_page,
+        page,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",

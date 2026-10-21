@@ -7,6 +7,12 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{AllDomainsResponse, CreateDomainResponse, ExistingDomain};
 use crate::validation::{validate_range, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct DomainsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To retrieve a list of all of the domains in your account, send a GET request to `/v2/domains`.
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_range, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn domains_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: DomainsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllDomainsResponse, SdkError> {
+    let DomainsListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -70,6 +76,12 @@ pub fn domains_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct DomainsCreateParams {
+    pub name: Option<String>,
+    pub ip_address: Option<String>,
+}
+
 /// To create a new domain, send a POST request to `/v2/domains`. Set the "name" attribute to the domain name you are adding. Optionally, you may set the "ip_address" attribute, and an A record will be automatically created pointing to the apex domain.
 ///
 /// # Arguments
@@ -82,10 +94,10 @@ pub fn domains_list(
 ///   domain.
 pub fn domains_create(
     config: &ClientConfig,
-    name: Option<String>,
-    ip_address: Option<String>,
+    params: DomainsCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<CreateDomainResponse, SdkError> {
+    let DomainsCreateParams { name, ip_address } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = name {
         __body_map.insert(
@@ -132,6 +144,11 @@ pub fn domains_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct DomainsGetParams {
+    pub domain_name: String,
+}
+
 /// To get details about a specific domain, send a GET request to `/v2/domains/$DOMAIN_NAME`.
 ///
 /// # Arguments
@@ -139,9 +156,10 @@ pub fn domains_create(
 /// * `domain_name` - The name of the domain itself.
 pub fn domains_get(
     config: &ClientConfig,
-    domain_name: String,
+    params: DomainsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ExistingDomain, SdkError> {
+    let DomainsGetParams { domain_name } = params;
     Ok(sdk_request::<ExistingDomain>(
         "GET",
         &format!(
@@ -166,6 +184,11 @@ pub fn domains_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct DomainsDeleteParams {
+    pub domain_name: String,
+}
+
 /// To delete a domain, send a DELETE request to `/v2/domains/$DOMAIN_NAME`.
 ///
 /// # Arguments
@@ -173,9 +196,10 @@ pub fn domains_get(
 /// * `domain_name` - The name of the domain itself.
 pub fn domains_delete(
     config: &ClientConfig,
-    domain_name: String,
+    params: DomainsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let DomainsDeleteParams { domain_name } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(

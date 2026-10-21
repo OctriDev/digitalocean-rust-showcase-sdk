@@ -7,6 +7,13 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{AssignedResourcesList, ResourcesList, Urn};
 use crate::validation::{validate_range, validate_uuid, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct ProjectsListResourcesParams {
+    pub project_id: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all your resources in a project, send a GET request to `/v2/projects/$PROJECT_ID/resources`. This endpoint will only return resources that you are authorized to see. For example, to see Droplets in a project, include the `droplet:read` scope.
 ///
 /// # Arguments
@@ -16,11 +23,14 @@ use crate::validation::{validate_range, validate_uuid, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn projects_list_resources(
     config: &ClientConfig,
-    project_id: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: ProjectsListResourcesParams,
     options: Option<&RequestOptions>,
 ) -> Result<ResourcesList, SdkError> {
+    let ProjectsListResourcesParams {
+        project_id,
+        per_page,
+        page,
+    } = params;
     validate_uuid("project_id", &project_id)?;
     if let Some(ref per_page_v) = per_page {
         validate_range(
@@ -77,6 +87,12 @@ pub fn projects_list_resources(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ProjectsAssignResourcesParams {
+    pub project_id: String,
+    pub resources: Option<Vec<Urn>>,
+}
+
 /// To assign resources to a project, send a POST request to `/v2/projects/$PROJECT_ID/resources`. You must have both `project:assign_resource` and `<resource\>:read` scopes to assign new resources. For example, to assign a Droplet to a project, include both the `project:assign_resource` and `droplet:read` scopes. The `project:update` scope also grants `project:assign_resource`.
 ///
 /// # Arguments
@@ -86,10 +102,13 @@ pub fn projects_list_resources(
 ///   project. Only resources that you are authorized to see will be returned.
 pub fn projects_assign_resources(
     config: &ClientConfig,
-    project_id: String,
-    resources: Option<Vec<Urn>>,
+    params: ProjectsAssignResourcesParams,
     options: Option<&RequestOptions>,
 ) -> Result<AssignedResourcesList, SdkError> {
+    let ProjectsAssignResourcesParams {
+        project_id,
+        resources,
+    } = params;
     validate_uuid("project_id", &project_id)?;
 
     let mut __body_map = serde_json::Map::new();
@@ -157,6 +176,11 @@ pub fn projects_list_resources_default(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ProjectsAssignResourcesDefaultParams {
+    pub resources: Option<Vec<Urn>>,
+}
+
 /// To assign resources to your default project, send a POST request to `/v2/projects/default/resources`. You must have both `project:assign_resource` and `<resource\>:read` scopes to assign new resources. For example, to assign a Droplet to the default project, include both the `project:assign_resource` and `droplet:read` scopes. The `project:update` scope also grants `project:assign_resource`.
 ///
 /// # Arguments
@@ -165,9 +189,10 @@ pub fn projects_list_resources_default(
 ///   project. Only resources that you are authorized to see will be returned.
 pub fn projects_assign_resources_default(
     config: &ClientConfig,
-    resources: Option<Vec<Urn>>,
+    params: ProjectsAssignResourcesDefaultParams,
     options: Option<&RequestOptions>,
 ) -> Result<AssignedResourcesList, SdkError> {
+    let ProjectsAssignResourcesDefaultParams { resources } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = resources {
         __body_map.insert(

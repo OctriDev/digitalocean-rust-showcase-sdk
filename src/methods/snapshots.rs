@@ -97,6 +97,13 @@ impl std::fmt::Display for SnapshotsListEnum {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct SnapshotsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+    pub resource_type: Option<SnapshotsListEnum>,
+}
+
 /// To list all of the snapshots available on your account, send a GET request to `/v2/snapshots`. The response will be a JSON object with a key called `snapshots`. This will be set to an array of `snapshot` objects, each of which will contain the standard snapshot attributes. ### Filtering Results by Resource Type It's possible to request filtered results by including certain query parameters. #### List Droplet Snapshots To retrieve only snapshots based on Droplets, include the `resource_type` query parameter set to `droplet`. For example, `/v2/snapshots?resource_type=droplet`. #### List Volume Snapshots To retrieve only snapshots based on volumes, include the `resource_type` query parameter set to `volume`. For example, `/v2/snapshots?resource_type=volume`.
 ///
 /// # Arguments
@@ -106,11 +113,14 @@ impl std::fmt::Display for SnapshotsListEnum {
 /// * `resource_type` - Used to filter snapshots by a resource type.
 pub fn snapshots_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
-    resource_type: Option<SnapshotsListEnum>,
+    params: SnapshotsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<SnapshotsResponse, SdkError> {
+    let SnapshotsListParams {
+        per_page,
+        page,
+        resource_type,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -165,6 +175,11 @@ pub fn snapshots_list(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct SnapshotsGetParams {
+    pub snapshot_id: SnapshotsDelete,
+}
+
 /// To retrieve information about a snapshot, send a GET request to `/v2/snapshots/$SNAPSHOT_ID`. The response will be a JSON object with a key called `snapshot`. The value of this will be an snapshot object containing the standard snapshot attributes.
 ///
 /// # Arguments
@@ -173,9 +188,10 @@ pub fn snapshots_list(
 ///   integer for a Droplet snapshot or a string for a volume snapshot.
 pub fn snapshots_get(
     config: &ClientConfig,
-    snapshot_id: SnapshotsDelete,
+    params: SnapshotsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<SnapshotsExisting, SdkError> {
+    let SnapshotsGetParams { snapshot_id } = params;
     Ok(sdk_request::<SnapshotsExisting>(
         "GET",
         &format!(
@@ -201,6 +217,11 @@ pub fn snapshots_get(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct SnapshotsDeleteParams {
+    pub snapshot_id: SnapshotsDelete,
+}
+
 /// Both Droplet and volume snapshots are managed through the `/v2/snapshots/` endpoint. To delete a snapshot, send a DELETE request to `/v2/snapshots/$SNAPSHOT_ID`. A status of 204 will be given. This indicates that the request was processed successfully, but that no response body is needed.
 ///
 /// # Arguments
@@ -209,9 +230,10 @@ pub fn snapshots_get(
 ///   integer for a Droplet snapshot or a string for a volume snapshot.
 pub fn snapshots_delete(
     config: &ClientConfig,
-    snapshot_id: SnapshotsDelete,
+    params: SnapshotsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let SnapshotsDeleteParams { snapshot_id } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(

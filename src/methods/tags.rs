@@ -7,6 +7,12 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{TagsAll, TagsExisting, TagsNew, TagsResourceResourcesItem};
 use crate::validation::{validate_length, validate_pattern, validate_range, LengthOpts, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct TagsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of your tags, you can send a GET request to `/v2/tags`. This endpoint will only return tagged resources that you are authorized to see (e.g. Droplets will only be returned if you have `droplet:read`).
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_length, validate_pattern, validate_range, Lengt
 /// * `page` - Which 'page' of paginated results to return.
 pub fn tags_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: TagsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<TagsAll, SdkError> {
+    let TagsListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -70,6 +76,11 @@ pub fn tags_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct TagsCreateParams {
+    pub name: Option<String>,
+}
+
 /// To create a tag you can send a POST request to `/v2/tags` with a `name` attribute.
 ///
 /// # Arguments
@@ -88,9 +99,10 @@ pub fn tags_list(
 ///   "PROD".
 pub fn tags_create(
     config: &ClientConfig,
-    name: Option<String>,
+    params: TagsCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<TagsNew, SdkError> {
+    let TagsCreateParams { name } = params;
     if let Some(ref name_v) = name {
         validate_length(
             "name",
@@ -139,6 +151,11 @@ pub fn tags_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct TagsGetParams {
+    pub tag_id: String,
+}
+
 /// To retrieve an individual tag, you can send a `GET` request to `/v2/tags/$TAG_NAME`. This endpoint will only return tagged resources that you are authorized to see. For example, to see tagged Droplets, include the `droplet:read` scope.
 ///
 /// # Arguments
@@ -147,9 +164,10 @@ pub fn tags_create(
 ///   dashes, and underscores. There is a limit of 255 characters per tag.
 pub fn tags_get(
     config: &ClientConfig,
-    tag_id: String,
+    params: TagsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<TagsExisting, SdkError> {
+    let TagsGetParams { tag_id } = params;
     validate_length(
         "tag_id",
         &tag_id,
@@ -181,6 +199,11 @@ pub fn tags_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct TagsDeleteParams {
+    pub tag_id: String,
+}
+
 /// A tag can be deleted by sending a `DELETE` request to `/v2/tags/$TAG_NAME`. Deleting a tag also untags all the resources that have previously been tagged by the Tag
 ///
 /// # Arguments
@@ -189,9 +212,10 @@ pub fn tags_get(
 ///   dashes, and underscores. There is a limit of 255 characters per tag.
 pub fn tags_delete(
     config: &ClientConfig,
-    tag_id: String,
+    params: TagsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let TagsDeleteParams { tag_id } = params;
     validate_length(
         "tag_id",
         &tag_id,
@@ -223,6 +247,12 @@ pub fn tags_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct TagsAssignResourcesParams {
+    pub tag_id: String,
+    pub resources: Vec<TagsResourceResourcesItem>,
+}
+
 /// Resources can be tagged by sending a POST request to `/v2/tags/$TAG_NAME/resources` with an array of json objects containing `resource_id` and `resource_type` attributes. Currently only tagging of Droplets, Databases, Images, Volumes, and Volume Snapshots is supported. `resource_type` is expected to be the string `droplet`, `database`, `image`, `volume` or `volume_snapshot`. `resource_id` is expected to be the ID of the resource as a string. In order to tag a resource, you must have both `tag:create` and `<resource type\>:update` scopes. For example, to tag a Droplet, you must have `tag:create` and `droplet:update`.
 ///
 /// # Arguments
@@ -235,10 +265,10 @@ pub fn tags_delete(
 ///   scope.
 pub fn tags_assign_resources(
     config: &ClientConfig,
-    tag_id: String,
-    resources: Vec<TagsResourceResourcesItem>,
+    params: TagsAssignResourcesParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let TagsAssignResourcesParams { tag_id, resources } = params;
     validate_length(
         "tag_id",
         &tag_id,
@@ -286,6 +316,12 @@ pub fn tags_assign_resources(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct TagsUnassignResourcesParams {
+    pub tag_id: String,
+    pub resources: Vec<TagsResourceResourcesItem>,
+}
+
 /// Resources can be untagged by sending a DELETE request to `/v2/tags/$TAG_NAME/resources` with an array of json objects containing `resource_id` and `resource_type` attributes. Currently only untagging of Droplets, Databases, Images, Volumes, and Volume Snapshots is supported. `resource_type` is expected to be the string `droplet`, `database`, `image`, `volume` or `volume_snapshot`. `resource_id` is expected to be the ID of the resource as a string. In order to untag a resource, you must have both `tag:delete` and `<resource type\>:update` scopes. For example, to untag a Droplet, you must have `tag:delete` and `droplet:update`.
 ///
 /// # Arguments
@@ -298,10 +334,10 @@ pub fn tags_assign_resources(
 ///   scope.
 pub fn tags_unassign_resources(
     config: &ClientConfig,
-    tag_id: String,
-    resources: Vec<TagsResourceResourcesItem>,
+    params: TagsUnassignResourcesParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let TagsUnassignResourcesParams { tag_id, resources } = params;
     validate_length(
         "tag_id",
         &tag_id,

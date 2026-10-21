@@ -50,6 +50,12 @@ impl ::std::convert::From<Box<ReservedIpv6ActionAssign>> for ReservedIPv6Actions
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpv6ActionsPostParams {
+    pub reserved_ipv6: String,
+    pub body: Option<ReservedIPv6ActionsPost>,
+}
+
 /// Triggers an action on a reserved IPv6 address to assign it to a Droplet or unassign it. Set `type` to `assign` or `unassign`, and include `droplet_id` when assigning the address. A 201 response returns the created action object.
 ///
 /// To initiate an action on a reserved IPv6 send a POST request to `/v2/reserved_ipv6/$RESERVED_IPV6/actions`. In the JSON body to the request, set the `type` attribute to on of the supported action types: | Action | Details |------------|-------- | `assign` | Assigns a reserved IPv6 to a Droplet | `unassign` | Unassign a reserved IPv6 from a Droplet
@@ -59,10 +65,13 @@ impl ::std::convert::From<Box<ReservedIpv6ActionAssign>> for ReservedIPv6Actions
 /// * `reserved_ipv6` - A reserved IPv6 address.
 pub fn reserved_ipv6_actions_post(
     config: &ClientConfig,
-    reserved_ipv6: String,
-    body: Option<ReservedIPv6ActionsPost>,
+    params: ReservedIpv6ActionsPostParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpv6Action, SdkError> {
+    let ReservedIpv6ActionsPostParams {
+        reserved_ipv6,
+        body,
+    } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),

@@ -52,6 +52,11 @@ impl ::std::convert::From<Box<ReservedIpActionAssign>> for ReservedIPsActionsPos
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpsActionsListParams {
+    pub reserved_ip: String,
+}
+
 /// To retrieve all actions that have been executed on a reserved IP, send a GET request to `/v2/reserved_ips/$RESERVED_IP/actions`.
 ///
 /// # Arguments
@@ -59,9 +64,10 @@ impl ::std::convert::From<Box<ReservedIpActionAssign>> for ReservedIPsActionsPos
 /// * `reserved_ip` - A reserved IP address.
 pub fn reserved_ips_actions_list(
     config: &ClientConfig,
-    reserved_ip: String,
+    params: ReservedIpsActionsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpActions, SdkError> {
+    let ReservedIpsActionsListParams { reserved_ip } = params;
     Ok(sdk_request::<ReservedIpActions>(
         "GET",
         &format!(
@@ -86,6 +92,12 @@ pub fn reserved_ips_actions_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpsActionsPostParams {
+    pub reserved_ip: String,
+    pub body: Option<ReservedIPsActionsPost>,
+}
+
 /// Submits an action to assign or unassign a reserved IP. Set `type` to `assign` or `unassign`, and include `droplet_id` when assigning the address to a Droplet. The response contains the action object for the requested operation.
 ///
 /// To initiate an action on a reserved IP send a POST request to `/v2/reserved_ips/$RESERVED_IP/actions`. In the JSON body to the request, set the `type` attribute to on of the supported action types: | Action | Details |------------|-------- | `assign` | Assigns a reserved IP to a Droplet | `unassign` | Unassign a reserved IP from a Droplet
@@ -95,10 +107,10 @@ pub fn reserved_ips_actions_list(
 /// * `reserved_ip` - A reserved IP address.
 pub fn reserved_ips_actions_post(
     config: &ClientConfig,
-    reserved_ip: String,
-    body: Option<ReservedIPsActionsPost>,
+    params: ReservedIpsActionsPostParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpAction, SdkError> {
+    let ReservedIpsActionsPostParams { reserved_ip, body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -131,6 +143,12 @@ pub fn reserved_ips_actions_post(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ReservedIpsActionsGetParams {
+    pub reserved_ip: String,
+    pub action_id: i64,
+}
+
 /// To retrieve the status of a reserved IP action, send a GET request to `/v2/reserved_ips/$RESERVED_IP/actions/$ACTION_ID`.
 ///
 /// # Arguments
@@ -140,10 +158,13 @@ pub fn reserved_ips_actions_post(
 ///   reference an action.
 pub fn reserved_ips_actions_get(
     config: &ClientConfig,
-    reserved_ip: String,
-    action_id: i64,
+    params: ReservedIpsActionsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ReservedIpAction, SdkError> {
+    let ReservedIpsActionsGetParams {
+        reserved_ip,
+        action_id,
+    } = params;
     validate_range(
         "action_id",
         action_id as f64,

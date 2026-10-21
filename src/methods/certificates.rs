@@ -55,6 +55,13 @@ impl ::std::convert::From<Box<CertificateRequestCustom>> for CertificatesCreate 
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CertificatesListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+    pub name: Option<String>,
+}
+
 /// To list all of the certificates available on your account, send a GET request to `/v2/certificates`.
 ///
 /// # Arguments
@@ -64,11 +71,14 @@ impl ::std::convert::From<Box<CertificateRequestCustom>> for CertificatesCreate 
 /// * `name` - Name of expected certificate
 pub fn certificates_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
-    name: Option<String>,
+    params: CertificatesListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllCertificates, SdkError> {
+    let CertificatesListParams {
+        per_page,
+        page,
+        name,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -123,14 +133,20 @@ pub fn certificates_list(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct CertificatesCreateParams {
+    pub body: CertificatesCreate,
+}
+
 /// Creates a certificate from a user-generated certificate and private key or requests one from Let's Encrypt. Set `type` to `custom` and provide `private_key` and `leaf_certificate`, or set it to `lets_encrypt` and provide `dns_names`; both request types require `name`. A Let's Encrypt certificate starts in the `pending` state and transitions to `verified` when it is ready to use.
 ///
 /// To upload new SSL certificate which you have previously generated, send a POST request to `/v2/certificates`. When uploading a user-generated certificate, the `private_key`, `leaf_certificate`, and optionally the `certificate_chain` attributes should be provided. The type must be set to `custom`. When using Let's Encrypt to create a certificate, the `dns_names` attribute must be provided, and the type must be set to `lets_encrypt`.
 pub fn certificates_create(
     config: &ClientConfig,
-    body: CertificatesCreate,
+    params: CertificatesCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<NewCertificate, SdkError> {
+    let CertificatesCreateParams { body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -159,6 +175,11 @@ pub fn certificates_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CertificatesGetParams {
+    pub certificate_id: String,
+}
+
 /// To show information about an existing certificate, send a GET request to `/v2/certificates/$CERTIFICATE_ID`.
 ///
 /// # Arguments
@@ -166,9 +187,10 @@ pub fn certificates_create(
 /// * `certificate_id` - A unique identifier for a certificate.
 pub fn certificates_get(
     config: &ClientConfig,
-    certificate_id: String,
+    params: CertificatesGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ExistingCertificate, SdkError> {
+    let CertificatesGetParams { certificate_id } = params;
     validate_uuid("certificate_id", &certificate_id)?;
 
     Ok(sdk_request::<ExistingCertificate>(
@@ -195,6 +217,11 @@ pub fn certificates_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct CertificatesDeleteParams {
+    pub certificate_id: String,
+}
+
 /// To delete a specific certificate, send a DELETE request to `/v2/certificates/$CERTIFICATE_ID`.
 ///
 /// # Arguments
@@ -202,9 +229,10 @@ pub fn certificates_get(
 /// * `certificate_id` - A unique identifier for a certificate.
 pub fn certificates_delete(
     config: &ClientConfig,
-    certificate_id: String,
+    params: CertificatesDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let CertificatesDeleteParams { certificate_id } = params;
     validate_uuid("certificate_id", &certificate_id)?;
 
     Ok(sdk_request::<serde_json::Value>(

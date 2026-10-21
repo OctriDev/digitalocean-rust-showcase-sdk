@@ -34,6 +34,12 @@ pub fn functions_list_namespaces(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsCreateNamespaceParams {
+    pub region: String,
+    pub label: String,
+}
+
 /// Creates a new serverless functions namespace in the desired region and associates it with the provided label. A namespace is a collection of functions and their associated packages, triggers, and project specifications. To create a namespace, send a POST request to `/v2/functions/namespaces` with the `region` and `label` properties.
 ///
 /// # Arguments
@@ -44,10 +50,10 @@ pub fn functions_list_namespaces(
 /// * `label` - The namespace's unique name.
 pub fn functions_create_namespace(
     config: &ClientConfig,
-    region: String,
-    label: String,
+    params: FunctionsCreateNamespaceParams,
     options: Option<&RequestOptions>,
 ) -> Result<NamespaceCreated, SdkError> {
+    let FunctionsCreateNamespaceParams { region, label } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "region".to_string(),
@@ -92,6 +98,11 @@ pub fn functions_create_namespace(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsGetNamespaceParams {
+    pub namespace_id: String,
+}
+
 /// Gets the namespace details for the given namespace UUID. To get namespace details, send a GET request to `/v2/functions/namespaces/$NAMESPACE_ID` with no parameters.
 ///
 /// # Arguments
@@ -99,9 +110,10 @@ pub fn functions_create_namespace(
 /// * `namespace_id` - The ID of the namespace to be managed.
 pub fn functions_get_namespace(
     config: &ClientConfig,
-    namespace_id: String,
+    params: FunctionsGetNamespaceParams,
     options: Option<&RequestOptions>,
 ) -> Result<NamespaceCreated, SdkError> {
+    let FunctionsGetNamespaceParams { namespace_id } = params;
     Ok(sdk_request::<NamespaceCreated>(
         "GET",
         &format!(
@@ -127,6 +139,11 @@ pub fn functions_get_namespace(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsDeleteNamespaceParams {
+    pub namespace_id: String,
+}
+
 /// Deletes the given namespace. When a namespace is deleted all assets, in the namespace are deleted, this includes packages, functions and triggers. Deleting a namespace is a destructive operation and assets in the namespace are not recoverable after deletion. Some metadata is retained, such as activations, or soft deleted for reporting purposes. To delete namespace, send a DELETE request to `/v2/functions/namespaces/$NAMESPACE_ID`. A successful deletion returns a 204 response.
 ///
 /// # Arguments
@@ -134,9 +151,10 @@ pub fn functions_get_namespace(
 /// * `namespace_id` - The ID of the namespace to be managed.
 pub fn functions_delete_namespace(
     config: &ClientConfig,
-    namespace_id: String,
+    params: FunctionsDeleteNamespaceParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let FunctionsDeleteNamespaceParams { namespace_id } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(
@@ -161,6 +179,11 @@ pub fn functions_delete_namespace(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsListTriggersParams {
+    pub namespace_id: String,
+}
+
 /// Returns a list of triggers associated with the current user and namespace. To get all triggers, send a GET request to `/v2/functions/namespaces/$NAMESPACE_ID/triggers`.
 ///
 /// # Arguments
@@ -168,9 +191,10 @@ pub fn functions_delete_namespace(
 /// * `namespace_id` - The ID of the namespace to be managed.
 pub fn functions_list_triggers(
     config: &ClientConfig,
-    namespace_id: String,
+    params: FunctionsListTriggersParams,
     options: Option<&RequestOptions>,
 ) -> Result<ListTriggers, SdkError> {
+    let FunctionsListTriggersParams { namespace_id } = params;
     Ok(sdk_request::<ListTriggers>(
         "GET",
         &format!(
@@ -305,6 +329,12 @@ pub fn functions_create_trigger(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsGetTriggerParams {
+    pub namespace_id: String,
+    pub trigger_name: String,
+}
+
 /// Gets the trigger details. To get the trigger details, send a GET request to `/v2/functions/namespaces/$NAMESPACE_ID/triggers/$TRIGGER_NAME`.
 ///
 /// # Arguments
@@ -313,10 +343,13 @@ pub fn functions_create_trigger(
 /// * `trigger_name` - The name of the trigger to be managed.
 pub fn functions_get_trigger(
     config: &ClientConfig,
-    namespace_id: String,
-    trigger_name: String,
+    params: FunctionsGetTriggerParams,
     options: Option<&RequestOptions>,
 ) -> Result<TriggerResponse, SdkError> {
+    let FunctionsGetTriggerParams {
+        namespace_id,
+        trigger_name,
+    } = params;
     Ok(sdk_request::<TriggerResponse>(
         "GET",
         &format!(
@@ -342,6 +375,14 @@ pub fn functions_get_trigger(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsUpdateTriggerParams {
+    pub namespace_id: String,
+    pub trigger_name: String,
+    pub is_enabled: Option<bool>,
+    pub scheduled_details: Option<ScheduledDetails>,
+}
+
 /// Updates the details of the given trigger. To update a trigger, send a PUT request to `/v2/functions/namespaces/$NAMESPACE_ID/triggers/$TRIGGER_NAME` with new values for the `is_enabled ` or `scheduled_details` properties.
 ///
 /// # Arguments
@@ -353,12 +394,15 @@ pub fn functions_get_trigger(
 ///   optional.
 pub fn functions_update_trigger(
     config: &ClientConfig,
-    namespace_id: String,
-    trigger_name: String,
-    is_enabled: Option<bool>,
-    scheduled_details: Option<ScheduledDetails>,
+    params: FunctionsUpdateTriggerParams,
     options: Option<&RequestOptions>,
 ) -> Result<TriggerResponse, SdkError> {
+    let FunctionsUpdateTriggerParams {
+        namespace_id,
+        trigger_name,
+        is_enabled,
+        scheduled_details,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = is_enabled {
         __body_map.insert(
@@ -411,6 +455,12 @@ pub fn functions_update_trigger(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsDeleteTriggerParams {
+    pub namespace_id: String,
+    pub trigger_name: String,
+}
+
 /// Deletes the given trigger. To delete trigger, send a DELETE request to `/v2/functions/namespaces/$NAMESPACE_ID/triggers/$TRIGGER_NAME`. A successful deletion returns a 204 response.
 ///
 /// # Arguments
@@ -419,10 +469,13 @@ pub fn functions_update_trigger(
 /// * `trigger_name` - The name of the trigger to be managed.
 pub fn functions_delete_trigger(
     config: &ClientConfig,
-    namespace_id: String,
-    trigger_name: String,
+    params: FunctionsDeleteTriggerParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let FunctionsDeleteTriggerParams {
+        namespace_id,
+        trigger_name,
+    } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(
@@ -448,6 +501,11 @@ pub fn functions_delete_trigger(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsAccessKeyListParams {
+    pub namespace_id: String,
+}
+
 /// Lists all access keys for a serverless functions namespace. To list access keys, send a GET request to `/v2/functions/namespaces/{namespace_id}/keys`.
 ///
 /// # Arguments
@@ -455,9 +513,10 @@ pub fn functions_delete_trigger(
 /// * `namespace_id` - The ID of the namespace to be managed.
 pub fn functions_access_key_list(
     config: &ClientConfig,
-    namespace_id: String,
+    params: FunctionsAccessKeyListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AccessKeyList, SdkError> {
+    let FunctionsAccessKeyListParams { namespace_id } = params;
     Ok(sdk_request::<AccessKeyList>(
         "GET",
         &format!(
@@ -482,6 +541,13 @@ pub fn functions_access_key_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsAccessKeyCreateParams {
+    pub namespace_id: String,
+    pub name: String,
+    pub expires_in: Option<String>,
+}
+
 /// Creates a new access key for a serverless functions namespace. The access key can be used to authenticate requests to the namespace's functions. The secret key is only returned once upon creation. To create an access key, send a POST request to `/v2/functions/namespaces/{namespace_id}/keys`.
 ///
 /// # Arguments
@@ -494,11 +560,14 @@ pub fn functions_access_key_list(
 ///   expire.
 pub fn functions_access_key_create(
     config: &ClientConfig,
-    namespace_id: String,
-    name: String,
-    expires_in: Option<String>,
+    params: FunctionsAccessKeyCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<AccessKeyCreate, SdkError> {
+    let FunctionsAccessKeyCreateParams {
+        namespace_id,
+        name,
+        expires_in,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "name".to_string(),
@@ -549,6 +618,13 @@ pub fn functions_access_key_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsAccessKeyUpdateParams {
+    pub namespace_id: String,
+    pub key_id: String,
+    pub name: String,
+}
+
 /// Updates the name of an access key for a serverless functions namespace. To update an access key, send a PUT request to `/v2/functions/namespaces/{namespace_id}/keys/{key_id}`.
 ///
 /// # Arguments
@@ -558,11 +634,14 @@ pub fn functions_access_key_create(
 /// * `name` - The new name for the access key.
 pub fn functions_access_key_update(
     config: &ClientConfig,
-    namespace_id: String,
-    key_id: String,
-    name: String,
+    params: FunctionsAccessKeyUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<AccessKeyUpdate, SdkError> {
+    let FunctionsAccessKeyUpdateParams {
+        namespace_id,
+        key_id,
+        name,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "name".to_string(),
@@ -603,6 +682,12 @@ pub fn functions_access_key_update(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FunctionsAccessKeyDeleteParams {
+    pub namespace_id: String,
+    pub key_id: String,
+}
+
 /// Deletes an access key for a serverless functions namespace. To delete an access key, send a DELETE request to `/v2/functions/namespaces/{namespace_id}/keys/{key_id}`.
 ///
 /// # Arguments
@@ -611,10 +696,13 @@ pub fn functions_access_key_update(
 /// * `key_id` - The ID of the access key to be managed.
 pub fn functions_access_key_delete(
     config: &ClientConfig,
-    namespace_id: String,
-    key_id: String,
+    params: FunctionsAccessKeyDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let FunctionsAccessKeyDeleteParams {
+        namespace_id,
+        key_id,
+    } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(

@@ -38,14 +38,20 @@ impl LoadBalancersRemoveDroplets {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct LoadBalancersCreateParams {
+    pub body: LoadBalancerCreateRequest,
+}
+
 /// Creates a load balancer in the specified region and assigns Droplets to it. Provide either `droplet_ids` to select Droplets individually or `tag` to select Droplets by tag; these methods are mutually exclusive. A 202 response confirms acceptance and returns the load balancer object.
 ///
 /// To create a new load balancer instance, send a POST request to `/v2/load_balancers`. You can specify the Droplets that will sit behind the load balancer using one of two methods: \* Set `droplet_ids` to a list of specific Droplet IDs. \* Set `tag` to the name of a tag. All Droplets with this tag applied will be assigned to the load balancer. Additional Droplets will be automatically assigned as they are tagged. These methods are mutually exclusive.
 pub fn load_balancers_create(
     config: &ClientConfig,
-    body: LoadBalancerCreateRequest,
+    params: LoadBalancersCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<LoadBalancerCreateResponse, SdkError> {
+    let LoadBalancersCreateParams { body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -74,6 +80,12 @@ pub fn load_balancers_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct LoadBalancersListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the load balancer instances on your account, send a GET request to `/v2/load_balancers`.
 ///
 /// # Arguments
@@ -82,10 +94,10 @@ pub fn load_balancers_create(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn load_balancers_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: LoadBalancersListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllLoadBalancers, SdkError> {
+    let LoadBalancersListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -137,6 +149,11 @@ pub fn load_balancers_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct LoadBalancersGetParams {
+    pub lb_id: String,
+}
+
 /// To show information about a load balancer instance, send a GET request to `/v2/load_balancers/$LOAD_BALANCER_ID`.
 ///
 /// # Arguments
@@ -144,9 +161,10 @@ pub fn load_balancers_list(
 /// * `lb_id` - A unique identifier for a load balancer.
 pub fn load_balancers_get(
     config: &ClientConfig,
-    lb_id: String,
+    params: LoadBalancersGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ExistingLoadBalancer, SdkError> {
+    let LoadBalancersGetParams { lb_id } = params;
     Ok(sdk_request::<ExistingLoadBalancer>(
         "GET",
         &format!(
@@ -171,6 +189,12 @@ pub fn load_balancers_get(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct LoadBalancersUpdateParams {
+    pub lb_id: String,
+    pub body: LoadBalancerUpdateRequest,
+}
+
 /// Replaces the settings for a load balancer. Send a full representation, including existing attributes you want to retain; any omitted attribute is reset to its default value. Choose either `droplet_ids` or `tag` to assign Droplets, and include `region` and `forwarding_rules`.
 ///
 /// To update a load balancer's settings, send a PUT request to `/v2/load_balancers/$LOAD_BALANCER_ID`. The request should contain a full representation of the load balancer including existing attributes. It may contain _one of_ the `droplets_ids` or `tag` attributes as they are mutually exclusive. \*\*Note that any attribute that is not provided will be reset to its default value.\*\*
@@ -180,10 +204,10 @@ pub fn load_balancers_get(
 /// * `lb_id` - A unique identifier for a load balancer.
 pub fn load_balancers_update(
     config: &ClientConfig,
-    lb_id: String,
-    body: LoadBalancerUpdateRequest,
+    params: LoadBalancersUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<UpdatedLoadBalancer, SdkError> {
+    let LoadBalancersUpdateParams { lb_id, body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -216,6 +240,11 @@ pub fn load_balancers_update(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct LoadBalancersDeleteParams {
+    pub lb_id: String,
+}
+
 /// To delete a load balancer instance, disassociating any Droplets assigned to it and removing it from your account, send a DELETE request to `/v2/load_balancers/$LOAD_BALANCER_ID`. A successful request will receive a 204 status code with no body in response. This indicates that the request was processed successfully.
 ///
 /// # Arguments
@@ -223,9 +252,10 @@ pub fn load_balancers_update(
 /// * `lb_id` - A unique identifier for a load balancer.
 pub fn load_balancers_delete(
     config: &ClientConfig,
-    lb_id: String,
+    params: LoadBalancersDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let LoadBalancersDeleteParams { lb_id } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(
@@ -250,6 +280,11 @@ pub fn load_balancers_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct LoadBalancersDeleteCacheParams {
+    pub lb_id: String,
+}
+
 /// To delete a Global load balancer CDN cache, send a DELETE request to `/v2/load_balancers/$LOAD_BALANCER_ID/cache`. A successful request will receive a 204 status code with no body in response. This indicates that the request was processed successfully.
 ///
 /// # Arguments
@@ -257,9 +292,10 @@ pub fn load_balancers_delete(
 /// * `lb_id` - A unique identifier for a load balancer.
 pub fn load_balancers_delete_cache(
     config: &ClientConfig,
-    lb_id: String,
+    params: LoadBalancersDeleteCacheParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let LoadBalancersDeleteCacheParams { lb_id } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(
@@ -284,6 +320,12 @@ pub fn load_balancers_delete_cache(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct LoadBalancersAddDropletsParams {
+    pub lb_id: String,
+    pub body: LoadBalancersAddDroplets,
+}
+
 /// To assign a Droplet to a load balancer instance, send a POST request to `/v2/load_balancers/$LOAD_BALANCER_ID/droplets`. In the body of the request, there should be a `droplet_ids` attribute containing a list of Droplet IDs. Individual Droplets can not be added to a load balancer configured with a Droplet tag. Attempting to do so will result in a "422 Unprocessable Entity" response from the API. No response body will be sent back, but the response code will indicate success. Specifically, the response code will be a 204, which means that the action was successful with no returned body data.
 ///
 /// # Arguments
@@ -291,10 +333,10 @@ pub fn load_balancers_delete_cache(
 /// * `lb_id` - A unique identifier for a load balancer.
 pub fn load_balancers_add_droplets(
     config: &ClientConfig,
-    lb_id: String,
-    body: LoadBalancersAddDroplets,
+    params: LoadBalancersAddDropletsParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let LoadBalancersAddDropletsParams { lb_id, body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -327,6 +369,12 @@ pub fn load_balancers_add_droplets(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct LoadBalancersRemoveDropletsParams {
+    pub lb_id: String,
+    pub body: LoadBalancersRemoveDroplets,
+}
+
 /// To remove a Droplet from a load balancer instance, send a DELETE request to `/v2/load_balancers/$LOAD_BALANCER_ID/droplets`. In the body of the request, there should be a `droplet_ids` attribute containing a list of Droplet IDs. No response body will be sent back, but the response code will indicate success. Specifically, the response code will be a 204, which means that the action was successful with no returned body data.
 ///
 /// # Arguments
@@ -334,10 +382,10 @@ pub fn load_balancers_add_droplets(
 /// * `lb_id` - A unique identifier for a load balancer.
 pub fn load_balancers_remove_droplets(
     config: &ClientConfig,
-    lb_id: String,
-    body: LoadBalancersRemoveDroplets,
+    params: LoadBalancersRemoveDropletsParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let LoadBalancersRemoveDropletsParams { lb_id, body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -370,6 +418,12 @@ pub fn load_balancers_remove_droplets(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct LoadBalancersAddForwardingRulesParams {
+    pub lb_id: String,
+    pub forwarding_rules: Vec<ForwardingRule>,
+}
+
 /// Adds one or more forwarding rules to a load balancer. Provide at least one rule in `forwarding_rules`, with the required entry and target protocols and ports. A 204 response confirms the rules were added and returns no body.
 ///
 /// To add an additional forwarding rule to a load balancer instance, send a POST request to `/v2/load_balancers/$LOAD_BALANCER_ID/forwarding_rules`. In the body of the request, there should be a `forwarding_rules` attribute containing an array of rules to be added. No response body will be sent back, but the response code will indicate success. Specifically, the response code will be a 204, which means that the action was successful with no returned body data.
@@ -379,10 +433,13 @@ pub fn load_balancers_remove_droplets(
 /// * `lb_id` - A unique identifier for a load balancer.
 pub fn load_balancers_add_forwarding_rules(
     config: &ClientConfig,
-    lb_id: String,
-    forwarding_rules: Vec<ForwardingRule>,
+    params: LoadBalancersAddForwardingRulesParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let LoadBalancersAddForwardingRulesParams {
+        lb_id,
+        forwarding_rules,
+    } = params;
     validate_items(
         "forwarding_rules",
         &forwarding_rules,
@@ -429,6 +486,12 @@ pub fn load_balancers_add_forwarding_rules(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct LoadBalancersRemoveForwardingRulesParams {
+    pub lb_id: String,
+    pub forwarding_rules: Vec<ForwardingRule>,
+}
+
 /// Removes one or more forwarding rules from a load balancer. Provide at least one rule in `forwarding_rules`, including each rule's entry and target protocols and ports. A 204 response confirms the rules were removed and returns no body.
 ///
 /// To remove forwarding rules from a load balancer instance, send a DELETE request to `/v2/load_balancers/$LOAD_BALANCER_ID/forwarding_rules`. In the body of the request, there should be a `forwarding_rules` attribute containing an array of rules to be removed. No response body will be sent back, but the response code will indicate success. Specifically, the response code will be a 204, which means that the action was successful with no returned body data.
@@ -438,10 +501,13 @@ pub fn load_balancers_add_forwarding_rules(
 /// * `lb_id` - A unique identifier for a load balancer.
 pub fn load_balancers_remove_forwarding_rules(
     config: &ClientConfig,
-    lb_id: String,
-    forwarding_rules: Vec<ForwardingRule>,
+    params: LoadBalancersRemoveForwardingRulesParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let LoadBalancersRemoveForwardingRulesParams {
+        lb_id,
+        forwarding_rules,
+    } = params;
     validate_items(
         "forwarding_rules",
         &forwarding_rules,
