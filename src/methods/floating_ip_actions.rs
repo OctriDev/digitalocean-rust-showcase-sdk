@@ -52,6 +52,11 @@ impl ::std::convert::From<Box<FloatingIpActionAssign>> for FloatingIPsActionPost
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FloatingIpsActionListParams {
+    pub floating_ip: String,
+}
+
 /// To retrieve all actions that have been executed on a floating IP, send a GET request to `/v2/floating_ips/$FLOATING_IP/actions`.
 ///
 /// # Arguments
@@ -59,9 +64,10 @@ impl ::std::convert::From<Box<FloatingIpActionAssign>> for FloatingIPsActionPost
 /// * `floating_ip` - A floating IP address.
 pub fn floating_ips_action_list(
     config: &ClientConfig,
-    floating_ip: String,
+    params: FloatingIpsActionListParams,
     options: Option<&RequestOptions>,
 ) -> Result<FloatingIpActions, SdkError> {
+    let FloatingIpsActionListParams { floating_ip } = params;
     Ok(sdk_request::<FloatingIpActions>(
         "GET",
         &format!(
@@ -86,6 +92,12 @@ pub fn floating_ips_action_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FloatingIpsActionPostParams {
+    pub floating_ip: String,
+    pub body: Option<FloatingIPsActionPost>,
+}
+
 /// Triggers an assignment or unassignment action on a floating IP. Set `type` to `assign` or `unassign`; include `droplet_id` when assigning the floating IP to a Droplet. The response contains the action object for tracking the operation.
 ///
 /// To initiate an action on a floating IP send a POST request to `/v2/floating_ips/$FLOATING_IP/actions`. In the JSON body to the request, set the `type` attribute to on of the supported action types: | Action | Details |------------|-------- | `assign` | Assigns a floating IP to a Droplet | `unassign` | Unassign a floating IP from a Droplet
@@ -95,10 +107,10 @@ pub fn floating_ips_action_list(
 /// * `floating_ip` - A floating IP address.
 pub fn floating_ips_action_post(
     config: &ClientConfig,
-    floating_ip: String,
-    body: Option<FloatingIPsActionPost>,
+    params: FloatingIpsActionPostParams,
     options: Option<&RequestOptions>,
 ) -> Result<FloatingIpAction, SdkError> {
+    let FloatingIpsActionPostParams { floating_ip, body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -131,6 +143,12 @@ pub fn floating_ips_action_post(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FloatingIpsActionGetParams {
+    pub floating_ip: String,
+    pub action_id: i64,
+}
+
 /// To retrieve the status of a floating IP action, send a GET request to `/v2/floating_ips/$FLOATING_IP/actions/$ACTION_ID`.
 ///
 /// # Arguments
@@ -140,10 +158,13 @@ pub fn floating_ips_action_post(
 ///   reference an action.
 pub fn floating_ips_action_get(
     config: &ClientConfig,
-    floating_ip: String,
-    action_id: i64,
+    params: FloatingIpsActionGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<FloatingIpAction, SdkError> {
+    let FloatingIpsActionGetParams {
+        floating_ip,
+        action_id,
+    } = params;
     validate_range(
         "action_id",
         action_id as f64,

@@ -10,6 +10,13 @@ use crate::types::{
 };
 use crate::validation::{validate_pattern, validate_range, validate_uuid, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcPeeringsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+    pub region: Option<RegionSlug>,
+}
+
 /// To list all of the VPC peerings on your account, send a GET request to `/v2/vpc_peerings`.
 ///
 /// # Arguments
@@ -20,11 +27,14 @@ use crate::validation::{validate_pattern, validate_range, validate_uuid, RangeOp
 ///   available.
 pub fn vpc_peerings_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
-    region: Option<RegionSlug>,
+    params: VpcPeeringsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllVpcPeerings, SdkError> {
+    let VpcPeeringsListParams {
+        per_page,
+        page,
+        region,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -80,12 +90,18 @@ pub fn vpc_peerings_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcPeeringsCreateParams {
+    pub body: VpcPeeringUpdatable,
+}
+
 /// To create a new VPC Peering, send a POST request to `/v2/vpc_peerings` specifying a name and a list of two VPC IDs to peer. The response code, 202 Accepted, does not indicate the success or failure of the operation, just that the request has been accepted for processing.
 pub fn vpc_peerings_create(
     config: &ClientConfig,
-    body: VpcPeeringUpdatable,
+    params: VpcPeeringsCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<ProvisioningVpcPeering, SdkError> {
+    let VpcPeeringsCreateParams { body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -114,6 +130,11 @@ pub fn vpc_peerings_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcPeeringsGetParams {
+    pub vpc_peering_id: String,
+}
+
 /// To show information about an existing VPC Peering, send a GET request to `/v2/vpc_peerings/$VPC_PEERING_ID`.
 ///
 /// # Arguments
@@ -121,9 +142,10 @@ pub fn vpc_peerings_create(
 /// * `vpc_peering_id` - A unique identifier for a VPC peering.
 pub fn vpc_peerings_get(
     config: &ClientConfig,
-    vpc_peering_id: String,
+    params: VpcPeeringsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ActiveVpcPeering, SdkError> {
+    let VpcPeeringsGetParams { vpc_peering_id } = params;
     validate_uuid("vpc_peering_id", &vpc_peering_id)?;
 
     Ok(sdk_request::<ActiveVpcPeering>(
@@ -150,6 +172,12 @@ pub fn vpc_peerings_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcPeeringsPatchParams {
+    pub vpc_peering_id: String,
+    pub name: String,
+}
+
 /// To update the name of a VPC peering, send a PATCH request to `/v2/vpc_peerings/$VPC_PEERING_ID` with the new `name` in the request body.
 ///
 /// # Arguments
@@ -159,10 +187,13 @@ pub fn vpc_peerings_get(
 ///   may only contain alphanumeric characters and dashes.
 pub fn vpc_peerings_patch(
     config: &ClientConfig,
-    vpc_peering_id: String,
-    name: String,
+    params: VpcPeeringsPatchParams,
     options: Option<&RequestOptions>,
 ) -> Result<ActiveVpcPeering, SdkError> {
+    let VpcPeeringsPatchParams {
+        vpc_peering_id,
+        name,
+    } = params;
     validate_uuid("vpc_peering_id", &vpc_peering_id)?;
     validate_pattern("name", &name, "^[a-zA-Z0-9\\-]+$")?;
 
@@ -203,6 +234,11 @@ pub fn vpc_peerings_patch(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcPeeringsDeleteParams {
+    pub vpc_peering_id: String,
+}
+
 /// To delete a VPC peering, send a DELETE request to `/v2/vpc_peerings/$VPC_PEERING_ID`.
 ///
 /// # Arguments
@@ -210,9 +246,10 @@ pub fn vpc_peerings_patch(
 /// * `vpc_peering_id` - A unique identifier for a VPC peering.
 pub fn vpc_peerings_delete(
     config: &ClientConfig,
-    vpc_peering_id: String,
+    params: VpcPeeringsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<DeletingVpcPeering, SdkError> {
+    let VpcPeeringsDeleteParams { vpc_peering_id } = params;
     validate_uuid("vpc_peering_id", &vpc_peering_id)?;
 
     Ok(sdk_request::<DeletingVpcPeering>(

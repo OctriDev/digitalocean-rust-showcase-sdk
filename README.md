@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ..Default::default()
     };
     let client = DigitalOcean::new(config);
-    let result = client.apps.get_instances("4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf".to_string(), None)?;
+    let result = client.apps.get_instances(octridev_digitalocean::methods::apps::AppsGetInstancesParams { app_id: "4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf".to_string() }, None)?;
     println!("{result:#?}");
     Ok(())
 }

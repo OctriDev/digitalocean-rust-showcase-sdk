@@ -52,6 +52,14 @@ impl ::std::convert::From<Box<VolumesXfs>> for VolumesCreate {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumesListParams {
+    pub name: Option<String>,
+    pub region: Option<RegionSlug>,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the block storage volumes available on your account, send a GET request to `/v2/volumes`. ## Filtering Results ### By Region The `region` may be provided as query parameter in order to restrict results to volumes available in a specific region. For example: `/v2/volumes?region=nyc1` ### By Name It is also possible to list volumes on your account that match a specified name. To do so, send a GET request with the volume's name as a query parameter to `/v2/volumes?name=$VOLUME_NAME`. \*\*Note:\*\* You can only create one volume per region with the same name. ### By Name and Region It is also possible to retrieve information about a block storage volume by name. To do so, send a GET request with the volume's name and the region slug for the region it is located in as query parameters to `/v2/volumes?name=$VOLUME_NAME&region=nyc1`.
 ///
 /// # Arguments
@@ -63,12 +71,15 @@ impl ::std::convert::From<Box<VolumesXfs>> for VolumesCreate {
 /// * `page` - Which 'page' of paginated results to return.
 pub fn volumes_list(
     config: &ClientConfig,
-    name: Option<String>,
-    region: Option<RegionSlug>,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VolumesListParams,
     options: Option<&RequestOptions>,
 ) -> Result<Volumes, SdkError> {
+    let VolumesListParams {
+        name,
+        region,
+        per_page,
+        page,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -126,14 +137,20 @@ pub fn volumes_list(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct VolumesCreateParams {
+    pub body: VolumesCreate,
+}
+
 /// Creates a block storage volume, optionally from a snapshot. Set `filesystem_type` to format the volume automatically, and provide `snapshot_id` when creating from a snapshot. Pre-formatted volumes auto-mount only on supported Droplets created on or after April 26, 2018; attaching them to unsupported Droplets is not recommended.
 ///
 /// To create a new volume, send a POST request to `/v2/volumes`. Optionally, a `filesystem_type` attribute may be provided in order to automatically format the volume's filesystem. Pre-formatted volumes are automatically mounted when attached to Ubuntu, Debian, Fedora, Fedora Atomic, and CentOS Droplets created on or after April 26, 2018\. Attaching pre-formatted volumes to Droplets without support for auto-mounting is not recommended.
 pub fn volumes_create(
     config: &ClientConfig,
-    body: VolumesCreate,
+    params: VolumesCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<Volume, SdkError> {
+    let VolumesCreateParams { body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -164,6 +181,12 @@ pub fn volumes_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumesDeleteByNameParams {
+    pub name: Option<String>,
+    pub region: Option<RegionSlug>,
+}
+
 /// Block storage volumes may also be deleted by name by sending a DELETE request with the volume's \*\*name\*\* and the \*\*region slug\*\* for the region it is located in as query parameters to `/v2/volumes?name=$VOLUME_NAME&region=nyc1`. No response body will be sent back, but the response code will indicate success. Specifically, the response code will be a 204, which means that the action was successful with no returned body data.
 ///
 /// # Arguments
@@ -173,10 +196,10 @@ pub fn volumes_create(
 ///   available.
 pub fn volumes_delete_by_name(
     config: &ClientConfig,
-    name: Option<String>,
-    region: Option<RegionSlug>,
+    params: VolumesDeleteByNameParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let VolumesDeleteByNameParams { name, region } = params;
     let mut __query: Vec<(&str, String)> = Vec::with_capacity(2);
     if let Some(ref v) = name {
         __query.push(("name", crate::client::query_value(v)));
@@ -207,6 +230,11 @@ pub fn volumes_delete_by_name(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumeSnapshotsGetByIdParams {
+    pub snapshot_id: String,
+}
+
 /// To retrieve the details of a snapshot that has been created from a volume, send a GET request to `/v2/volumes/snapshots/$VOLUME_SNAPSHOT_ID`.
 ///
 /// # Arguments
@@ -214,9 +242,10 @@ pub fn volumes_delete_by_name(
 /// * `snapshot_id` - The unique identifier for the snapshot.
 pub fn volume_snapshots_get_by_id(
     config: &ClientConfig,
-    snapshot_id: String,
+    params: VolumeSnapshotsGetByIdParams,
     options: Option<&RequestOptions>,
 ) -> Result<VolumeSnapshot, SdkError> {
+    let VolumeSnapshotsGetByIdParams { snapshot_id } = params;
     Ok(sdk_request::<VolumeSnapshot>(
         "GET",
         &format!(
@@ -241,6 +270,11 @@ pub fn volume_snapshots_get_by_id(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumeSnapshotsDeleteByIdParams {
+    pub snapshot_id: String,
+}
+
 /// To delete a volume snapshot, send a DELETE request to `/v2/volumes/snapshots/$VOLUME_SNAPSHOT_ID`. A status of 204 will be given. This indicates that the request was processed successfully, but that no response body is needed.
 ///
 /// # Arguments
@@ -248,9 +282,10 @@ pub fn volume_snapshots_get_by_id(
 /// * `snapshot_id` - The unique identifier for the snapshot.
 pub fn volume_snapshots_delete_by_id(
     config: &ClientConfig,
-    snapshot_id: String,
+    params: VolumeSnapshotsDeleteByIdParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let VolumeSnapshotsDeleteByIdParams { snapshot_id } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(
@@ -275,6 +310,11 @@ pub fn volume_snapshots_delete_by_id(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumesGetParams {
+    pub volume_id: String,
+}
+
 /// To show information about a block storage volume, send a GET request to `/v2/volumes/$VOLUME_ID`.
 ///
 /// # Arguments
@@ -282,9 +322,10 @@ pub fn volume_snapshots_delete_by_id(
 /// * `volume_id` - The ID of the block storage volume.
 pub fn volumes_get(
     config: &ClientConfig,
-    volume_id: String,
+    params: VolumesGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<Volume, SdkError> {
+    let VolumesGetParams { volume_id } = params;
     validate_uuid("volume_id", &volume_id)?;
 
     Ok(sdk_request::<Volume>(
@@ -311,6 +352,11 @@ pub fn volumes_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumesDeleteParams {
+    pub volume_id: String,
+}
+
 /// To delete a block storage volume, destroying all data and removing it from your account, send a DELETE request to `/v2/volumes/$VOLUME_ID`. No response body will be sent back, but the response code will indicate success. Specifically, the response code will be a 204, which means that the action was successful with no returned body data.
 ///
 /// # Arguments
@@ -318,9 +364,10 @@ pub fn volumes_get(
 /// * `volume_id` - The ID of the block storage volume.
 pub fn volumes_delete(
     config: &ClientConfig,
-    volume_id: String,
+    params: VolumesDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let VolumesDeleteParams { volume_id } = params;
     validate_uuid("volume_id", &volume_id)?;
 
     Ok(sdk_request::<serde_json::Value>(
@@ -347,6 +394,13 @@ pub fn volumes_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumeSnapshotsListParams {
+    pub volume_id: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To retrieve the snapshots that have been created from a volume, send a GET request to `/v2/volumes/$VOLUME_ID/snapshots`.
 ///
 /// # Arguments
@@ -356,11 +410,14 @@ pub fn volumes_delete(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn volume_snapshots_list(
     config: &ClientConfig,
-    volume_id: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VolumeSnapshotsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<VolumeSnapshots, SdkError> {
+    let VolumeSnapshotsListParams {
+        volume_id,
+        per_page,
+        page,
+    } = params;
     validate_uuid("volume_id", &volume_id)?;
     if let Some(ref per_page_v) = per_page {
         validate_range(
@@ -417,6 +474,13 @@ pub fn volume_snapshots_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumeSnapshotsCreateParams {
+    pub volume_id: String,
+    pub name: String,
+    pub tags: Option<Option<TagsArray>>,
+}
+
 /// To create a snapshot from a volume, sent a POST request to `/v2/volumes/$VOLUME_ID/snapshots`.
 ///
 /// # Arguments
@@ -428,11 +492,14 @@ pub fn volume_snapshots_list(
 ///   `tag:create` scope.
 pub fn volume_snapshots_create(
     config: &ClientConfig,
-    volume_id: String,
-    name: String,
-    tags: Option<Option<TagsArray>>,
+    params: VolumeSnapshotsCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<VolumeSnapshot, SdkError> {
+    let VolumeSnapshotsCreateParams {
+        volume_id,
+        name,
+        tags,
+    } = params;
     validate_uuid("volume_id", &volume_id)?;
 
     let mut __body_map = serde_json::Map::new();

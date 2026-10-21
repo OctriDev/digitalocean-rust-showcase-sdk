@@ -7,6 +7,12 @@ use crate::errors::{SdkError, SdkNetworkError};
 use crate::types::{FloatingIpCreate, FloatingIpCreated, FloatingIpList, FloatingIpResponse};
 use crate::validation::{validate_range, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct FloatingIpsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the floating IPs available on your account, send a GET request to `/v2/floating_ips`.
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_range, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn floating_ips_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: FloatingIpsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<FloatingIpList, SdkError> {
+    let FloatingIpsListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -70,14 +76,20 @@ pub fn floating_ips_list(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct FloatingIpsCreateParams {
+    pub body: FloatingIpCreate,
+}
+
 /// Creates a floating IP assigned to a Droplet or reserved to a region. Supply `droplet_id` to assign it to a Droplet, or supply `region` to reserve it; `project_id` can associate a region-reserved floating IP with a project. A 202 response returns the floating IP object and, when assigning it to a Droplet, links to the Droplet and assignment action.
 ///
 /// On creation, a floating IP must be either assigned to a Droplet or reserved to a region. \* To create a new floating IP assigned to a Droplet, send a POST request to `/v2/floating_ips` with the `droplet_id` attribute. \* To create a new floating IP reserved to a region, send a POST request to `/v2/floating_ips` with the `region` attribute.
 pub fn floating_ips_create(
     config: &ClientConfig,
-    body: FloatingIpCreate,
+    params: FloatingIpsCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<FloatingIpCreated, SdkError> {
+    let FloatingIpsCreateParams { body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),
@@ -106,6 +118,11 @@ pub fn floating_ips_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FloatingIpsGetParams {
+    pub floating_ip: String,
+}
+
 /// To show information about a floating IP, send a GET request to `/v2/floating_ips/$FLOATING_IP_ADDR`.
 ///
 /// # Arguments
@@ -113,9 +130,10 @@ pub fn floating_ips_create(
 /// * `floating_ip` - A floating IP address.
 pub fn floating_ips_get(
     config: &ClientConfig,
-    floating_ip: String,
+    params: FloatingIpsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<FloatingIpResponse, SdkError> {
+    let FloatingIpsGetParams { floating_ip } = params;
     Ok(sdk_request::<FloatingIpResponse>(
         "GET",
         &format!(
@@ -140,6 +158,11 @@ pub fn floating_ips_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct FloatingIpsDeleteParams {
+    pub floating_ip: String,
+}
+
 /// To delete a floating IP and remove it from your account, send a DELETE request to `/v2/floating_ips/$FLOATING_IP_ADDR`. A successful request will receive a 204 status code with no body in response. This indicates that the request was processed successfully.
 ///
 /// # Arguments
@@ -147,9 +170,10 @@ pub fn floating_ips_get(
 /// * `floating_ip` - A floating IP address.
 pub fn floating_ips_delete(
     config: &ClientConfig,
-    floating_ip: String,
+    params: FloatingIpsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let FloatingIpsDeleteParams { floating_ip } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(

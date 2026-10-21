@@ -7,6 +7,12 @@ use crate::errors::SdkError;
 use crate::types::AllSizes;
 use crate::validation::{validate_range, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct SizesListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of available Droplet sizes, send a GET request to `/v2/sizes`. The response will be a JSON object with a key called `sizes`. The value of this will be an array of `size` objects each of which contain the standard size attributes.
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_range, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn sizes_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: SizesListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllSizes, SdkError> {
+    let SizesListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",

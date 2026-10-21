@@ -35,6 +35,11 @@ pub fn addons_get_app(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AddonsGetAppMetadataParams {
+    pub app_slug: String,
+}
+
 /// To find out what metadata is required for a specific add-on, send a GET request to `/v2/add-ons/apps/{app_slug}/metadata`. Metadata varies by application.
 ///
 /// # Arguments
@@ -43,9 +48,10 @@ pub fn addons_get_app(
 ///   being requested.
 pub fn addons_get_app_metadata(
     config: &ClientConfig,
-    app_slug: String,
+    params: AddonsGetAppMetadataParams,
     options: Option<&RequestOptions>,
 ) -> Result<AddonsGetAppMetadata, SdkError> {
+    let AddonsGetAppMetadataParams { app_slug } = params;
     Ok(sdk_request::<AddonsGetAppMetadata>(
         "GET",
         &format!(
@@ -216,6 +222,11 @@ pub fn addons_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AddonsGetParams {
+    pub resource_uuid: String,
+}
+
 /// To fetch details of a specific Add-On Resource, send a GET request to `/v2/add-ons/saas/{resource_uuid}`. Replace `{resource_uuid}` with the UUID of the resource you want to retrieve.
 ///
 /// # Arguments
@@ -223,9 +234,10 @@ pub fn addons_create(
 /// * `resource_uuid` - The UUID of the add-on resource to retrieve.
 pub fn addons_get(
     config: &ClientConfig,
-    resource_uuid: String,
+    params: AddonsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<AddonsGet, SdkError> {
+    let AddonsGetParams { resource_uuid } = params;
     Ok(sdk_request::<AddonsGet>(
         "GET",
         &format!(
@@ -250,6 +262,11 @@ pub fn addons_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AddonsDeleteParams {
+    pub resource_uuid: String,
+}
+
 /// To delete an add-on resource, send a DELETE request to `/v2/add-ons/saas/{resource_uuid}` with the UUID of the resource to delete. You cannot retrieve the resource after it has been deleted. The response indicates a request was sent to the 3rd party add-on provider to delete the resource. You will no longer be billed for this resource.
 ///
 /// # Arguments
@@ -257,9 +274,10 @@ pub fn addons_get(
 /// * `resource_uuid` - A unique identifier for the add-on resource.
 pub fn addons_delete(
     config: &ClientConfig,
-    resource_uuid: String,
+    params: AddonsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let AddonsDeleteParams { resource_uuid } = params;
     validate_uuid("resource_uuid", &resource_uuid)?;
 
     Ok(sdk_request::<serde_json::Value>(
@@ -286,6 +304,12 @@ pub fn addons_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AddonsPatchParams {
+    pub resource_uuid: String,
+    pub name: String,
+}
+
 /// To change the name of an Add-On Resource, send a PATCH request to `/v2/add-ons/saas/{resource_uuid}`. Replace `{resource_uuid}` with the UUID of the resource for which you want to change the name.
 ///
 /// # Arguments
@@ -294,10 +318,13 @@ pub fn addons_delete(
 /// * `name` - The new name for the add-on resource.
 pub fn addons_patch(
     config: &ClientConfig,
-    resource_uuid: String,
-    name: String,
+    params: AddonsPatchParams,
     options: Option<&RequestOptions>,
 ) -> Result<AddonsUpdate, SdkError> {
+    let AddonsPatchParams {
+        resource_uuid,
+        name,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "name".to_string(),
@@ -335,6 +362,12 @@ pub fn addons_patch(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct AddonsPatchPlanParams {
+    pub resource_uuid: String,
+    pub plan_slug: String,
+}
+
 /// To change the plan associated with an Add-On Resource, send a PATCH request to `/v2/add-ons/saas/{resource_uuid}/plan`. Replace `{resource_uuid}` with the UUID of the resource for which you want to change the plan.
 ///
 /// # Arguments
@@ -344,10 +377,13 @@ pub fn addons_patch(
 ///   resource.
 pub fn addons_patch_plan(
     config: &ClientConfig,
-    resource_uuid: String,
-    plan_slug: String,
+    params: AddonsPatchPlanParams,
     options: Option<&RequestOptions>,
 ) -> Result<AddonsUpdate, SdkError> {
+    let AddonsPatchPlanParams {
+        resource_uuid,
+        plan_slug,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "plan_slug".to_string(),

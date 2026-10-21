@@ -110,6 +110,12 @@ impl ::std::convert::From<Box<NfsActionSwitchPerformanceTier>> for NfsCreateActi
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct NfsCreateActionParams {
+    pub nfs_id: String,
+    pub body: NfsCreateAction,
+}
+
 /// Triggers an action on an NFS share, such as resizing it, taking a snapshot, or changing its VPC attachment. Set `type` to a supported action and supply the corresponding values in `params`, such as `size_gib` for resize or `vpc_id` for attach and detach. A 201 response returns the submitted action object for tracking its status.
 ///
 /// To execute an action (such as resize) on a specified NFS share, send a POST request to `/v2/nfs/{nfs_id}/actions`. In the JSON body to the request, set the `type` attribute to on of the supported action types: | Action | Details | | -------------------------------- | ----------- | | <nobr\>`resize`</nobr\> | Resizes an NFS share. Set the size_gib attribute to a desired value in GiB | | <nobr\>`snapshot`</nobr\> | Takes a snapshot of an NFS share | | <nobr\>`attach`</nobr\> | Attaches an NFS share to a VPC. Set the vpc_id attribute to the desired VPC ID | | <nobr\>`detach`</nobr\> | Detaches an NFS share from a VPC. Set the vpc_id attribute to the desired VPC ID | | <nobr\>`reassign`</nobr\> | Reassigns an NFS share from one VPC to another. Set the old_vpc_id and new_vpc_id attributes to the desired VPC IDs | | <nobr\>`switch_performance_tier`</nobr\> | Switches the performance tier of an NFS share. Set the performance_tier attribute to the desired tier (e.g., standard, high) |
@@ -119,10 +125,10 @@ impl ::std::convert::From<Box<NfsActionSwitchPerformanceTier>> for NfsCreateActi
 /// * `nfs_id` - The unique ID of the NFS share
 pub fn nfs_create_action(
     config: &ClientConfig,
-    nfs_id: String,
-    body: NfsCreateAction,
+    params: NfsCreateActionParams,
     options: Option<&RequestOptions>,
 ) -> Result<NfsActionsResponse, SdkError> {
+    let NfsCreateActionParams { nfs_id, body } = params;
     let __body = serde_json::to_value(body).map_err(|e| {
         SdkError::Network(SdkNetworkError {
             message: format!("encode body: {}", e),

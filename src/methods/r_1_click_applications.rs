@@ -53,6 +53,11 @@ impl std::fmt::Display for OneClicksListEnum {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct OneClicksListParams {
+    pub type_: Option<OneClicksListEnum>,
+}
+
 /// To list all available 1-Click applications, send a GET request to `/v2/1-clicks`. The `type` may be provided as query paramater in order to restrict results to a certain type of 1-Click, for example: `/v2/1-clicks?type=droplet`. Current supported types are `kubernetes` and `droplet`. The response will be a JSON object with a key called `1_clicks`. This will be set to an array of 1-Click application data, each of which will contain the the slug and type for the 1-Click.
 ///
 /// # Arguments
@@ -60,9 +65,10 @@ impl std::fmt::Display for OneClicksListEnum {
 /// * `type_` - Restrict results to a certain type of 1-Click.
 pub fn one_clicks_list(
     config: &ClientConfig,
-    type_: Option<OneClicksListEnum>,
+    params: OneClicksListParams,
     options: Option<&RequestOptions>,
 ) -> Result<OneClicksAll, SdkError> {
+    let OneClicksListParams { type_ } = params;
     let mut __query: Vec<(&str, String)> = Vec::with_capacity(1);
     if let Some(ref v) = type_ {
         __query.push(("type", crate::client::query_value(v)));
@@ -89,6 +95,12 @@ pub fn one_clicks_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct OneClicksInstallKubernetesParams {
+    pub addon_slugs: Vec<String>,
+    pub cluster_uuid: String,
+}
+
 /// To install a Kubernetes 1-Click application on a cluster, send a POST request to `/v2/1-clicks/kubernetes`. The `addon_slugs` and `cluster_uuid` must be provided as body parameter in order to specify which 1-Click application(s) to install. To list all available 1-Click Kubernetes applications, send a request to `/v2/1-clicks?type=kubernetes`.
 ///
 /// # Arguments
@@ -99,10 +111,13 @@ pub fn one_clicks_list(
 ///   1-Click Applications will be installed.
 pub fn one_clicks_install_kubernetes(
     config: &ClientConfig,
-    addon_slugs: Vec<String>,
-    cluster_uuid: String,
+    params: OneClicksInstallKubernetesParams,
     options: Option<&RequestOptions>,
 ) -> Result<OneClicksCreateResponse, SdkError> {
+    let OneClicksInstallKubernetesParams {
+        addon_slugs,
+        cluster_uuid,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "addon_slugs".to_string(),

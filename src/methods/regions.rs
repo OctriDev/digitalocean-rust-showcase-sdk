@@ -7,6 +7,12 @@ use crate::errors::SdkError;
 use crate::types::AllRegions;
 use crate::validation::{validate_range, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct RegionsListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all of the regions that are available, send a GET request to `/v2/regions`. The response will be a JSON object with a key called `regions`. The value of this will be an array of `region` objects, each of which will contain the standard region attributes.
 ///
 /// # Arguments
@@ -15,10 +21,10 @@ use crate::validation::{validate_range, RangeOpts};
 /// * `page` - Which 'page' of paginated results to return.
 pub fn regions_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: RegionsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllRegions, SdkError> {
+    let RegionsListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",

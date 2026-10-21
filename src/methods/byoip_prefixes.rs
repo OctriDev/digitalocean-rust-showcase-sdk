@@ -10,6 +10,13 @@ use crate::types::{
 };
 use crate::validation::{validate_range, validate_uuid, RangeOpts};
 
+#[derive(Debug, Clone, Default)]
+pub struct ByoipPrefixesCreateParams {
+    pub prefix: String,
+    pub region: String,
+    pub signature: String,
+}
+
 /// To create a BYOIP prefix, send a POST request to `/v2/byoip_prefixes`. A successful request will initiate the process of bringing your BYOIP Prefix into your account. The response will include the details of the created prefix, including its UUID and status.
 ///
 /// # Arguments
@@ -19,11 +26,14 @@ use crate::validation::{validate_range, validate_uuid, RangeOpts};
 /// * `signature` - The signature hash for the prefix creation request
 pub fn byoip_prefixes_create(
     config: &ClientConfig,
-    prefix: String,
-    region: String,
-    signature: String,
+    params: ByoipPrefixesCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<ByoipPrefixCreateResponse, SdkError> {
+    let ByoipPrefixesCreateParams {
+        prefix,
+        region,
+        signature,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     __body_map.insert(
         "prefix".to_string(),
@@ -76,6 +86,12 @@ pub fn byoip_prefixes_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ByoipPrefixesListParams {
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all BYOIP prefixes, send a GET request to `/v2/byoip_prefixes`. A successful response will return a list of all BYOIP prefixes associated with the account.
 ///
 /// # Arguments
@@ -84,10 +100,10 @@ pub fn byoip_prefixes_create(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn byoip_prefixes_list(
     config: &ClientConfig,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: ByoipPrefixesListParams,
     options: Option<&RequestOptions>,
 ) -> Result<ByoipPrefixList, SdkError> {
+    let ByoipPrefixesListParams { per_page, page } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -139,6 +155,11 @@ pub fn byoip_prefixes_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ByoipPrefixesGetParams {
+    pub byoip_prefix_uuid: String,
+}
+
 /// To get a BYOIP prefix, send a GET request to `/v2/byoip_prefixes/$byoip_prefix_uuid`. A successful response will return the details of the specified BYOIP prefix.
 ///
 /// # Arguments
@@ -146,9 +167,10 @@ pub fn byoip_prefixes_list(
 /// * `byoip_prefix_uuid` - The unique identifier for the BYOIP Prefix.
 pub fn byoip_prefixes_get(
     config: &ClientConfig,
-    byoip_prefix_uuid: String,
+    params: ByoipPrefixesGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ByoipPrefixGet, SdkError> {
+    let ByoipPrefixesGetParams { byoip_prefix_uuid } = params;
     validate_uuid("byoip_prefix_uuid", &byoip_prefix_uuid)?;
 
     Ok(sdk_request::<ByoipPrefixGet>(
@@ -176,6 +198,11 @@ pub fn byoip_prefixes_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ByoipPrefixesDeleteParams {
+    pub byoip_prefix_uuid: String,
+}
+
 /// To delete a BYOIP prefix and remove it from your account, send a DELETE request to `/v2/byoip_prefixes/$byoip_prefix_uuid`. A successful request will receive a 202 status code with no body in response. This indicates that the request was accepted and the prefix is being deleted.
 ///
 /// # Arguments
@@ -183,9 +210,10 @@ pub fn byoip_prefixes_get(
 /// * `byoip_prefix_uuid` - The unique identifier for the BYOIP Prefix.
 pub fn byoip_prefixes_delete(
     config: &ClientConfig,
-    byoip_prefix_uuid: String,
+    params: ByoipPrefixesDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let ByoipPrefixesDeleteParams { byoip_prefix_uuid } = params;
     validate_uuid("byoip_prefix_uuid", &byoip_prefix_uuid)?;
 
     Ok(sdk_request::<serde_json::Value>(
@@ -213,6 +241,12 @@ pub fn byoip_prefixes_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ByoipPrefixesPatchParams {
+    pub byoip_prefix_uuid: String,
+    pub advertise: Option<bool>,
+}
+
 /// To update a BYOIP prefix, send a PATCH request to `/v2/byoip_prefixes/$byoip_prefix_uuid`. Currently, you can update the advertisement status of the prefix. The response will include the updated details of the prefix.
 ///
 /// # Arguments
@@ -221,10 +255,13 @@ pub fn byoip_prefixes_delete(
 /// * `advertise` - Whether the BYOIP prefix should be advertised
 pub fn byoip_prefixes_patch(
     config: &ClientConfig,
-    byoip_prefix_uuid: String,
-    advertise: Option<bool>,
+    params: ByoipPrefixesPatchParams,
     options: Option<&RequestOptions>,
 ) -> Result<ByoipPrefixUpdateResponse, SdkError> {
+    let ByoipPrefixesPatchParams {
+        byoip_prefix_uuid,
+        advertise,
+    } = params;
     validate_uuid("byoip_prefix_uuid", &byoip_prefix_uuid)?;
 
     let mut __body_map = serde_json::Map::new();
@@ -267,6 +304,13 @@ pub fn byoip_prefixes_patch(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ByoipPrefixesListResourcesParams {
+    pub byoip_prefix_uuid: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list resources associated with BYOIP prefixes, send a GET request to `/v2/byoip_prefixes/{byoip_prefix_uuid}/ips`. A successful response will return a list of resources associated with the specified BYOIP prefix.
 ///
 /// # Arguments
@@ -276,11 +320,14 @@ pub fn byoip_prefixes_patch(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn byoip_prefixes_list_resources(
     config: &ClientConfig,
-    byoip_prefix_uuid: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: ByoipPrefixesListResourcesParams,
     options: Option<&RequestOptions>,
 ) -> Result<ByoipPrefixListResources, SdkError> {
+    let ByoipPrefixesListResourcesParams {
+        byoip_prefix_uuid,
+        per_page,
+        page,
+    } = params;
     validate_uuid("byoip_prefix_uuid", &byoip_prefix_uuid)?;
     if let Some(ref per_page_v) = per_page {
         validate_range(

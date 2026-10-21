@@ -111,6 +111,12 @@ pub fn spaces_key_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct SpacesKeyCreateParams {
+    pub name: Option<String>,
+    pub grants: Option<Vec<Grant>>,
+}
+
 /// To create a new Spaces Access Key, send a POST request to `/v2/spaces/keys`. At the moment, you cannot mix a fullaccess permission with scoped permissions. A fullaccess permission will be prioritized if fullaccess and scoped permissions are both added.
 ///
 /// # Arguments
@@ -119,10 +125,10 @@ pub fn spaces_key_list(
 /// * `grants` - The list of permissions for the access key.
 pub fn spaces_key_create(
     config: &ClientConfig,
-    name: Option<String>,
-    grants: Option<Vec<Grant>>,
+    params: SpacesKeyCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<KeyCreate, SdkError> {
+    let SpacesKeyCreateParams { name, grants } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = name {
         __body_map.insert(
@@ -170,6 +176,11 @@ pub fn spaces_key_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct SpacesKeyGetParams {
+    pub access_key: String,
+}
+
 /// To get a Spaces Access Key, send a GET request to `/v2/spaces/keys/$ACCESS_KEY`. A successful request will return the Access Key.
 ///
 /// # Arguments
@@ -177,9 +188,10 @@ pub fn spaces_key_create(
 /// * `access_key` - The access key's ID.
 pub fn spaces_key_get(
     config: &ClientConfig,
-    access_key: String,
+    params: SpacesKeyGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<KeyGet, SdkError> {
+    let SpacesKeyGetParams { access_key } = params;
     Ok(sdk_request::<KeyGet>(
         "GET",
         &format!(
@@ -204,6 +216,11 @@ pub fn spaces_key_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct SpacesKeyDeleteParams {
+    pub access_key: String,
+}
+
 /// To delete a Spaces Access Key, send a DELETE request to `/v2/spaces/keys/$ACCESS_KEY`. A successful request will return a `204 No Content` status code.
 ///
 /// # Arguments
@@ -211,9 +228,10 @@ pub fn spaces_key_get(
 /// * `access_key` - The access key's ID.
 pub fn spaces_key_delete(
     config: &ClientConfig,
-    access_key: String,
+    params: SpacesKeyDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let SpacesKeyDeleteParams { access_key } = params;
     Ok(sdk_request::<serde_json::Value>(
         "DELETE",
         &format!(
@@ -238,6 +256,13 @@ pub fn spaces_key_delete(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct SpacesKeyUpdateParams {
+    pub access_key: String,
+    pub name: Option<String>,
+    pub grants: Option<Vec<Grant>>,
+}
+
 /// To update Spaces Access Key, send a PUT or PATCH request to `/v2/spaces/keys/$ACCESS_KEY`. At the moment, you cannot convert a fullaccess key to a scoped key or vice versa. You can only update the name of the key.
 ///
 /// # Arguments
@@ -247,11 +272,14 @@ pub fn spaces_key_delete(
 /// * `grants` - The list of permissions for the access key.
 pub fn spaces_key_update(
     config: &ClientConfig,
-    access_key: String,
-    name: Option<String>,
-    grants: Option<Vec<Grant>>,
+    params: SpacesKeyUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<KeyUpdate, SdkError> {
+    let SpacesKeyUpdateParams {
+        access_key,
+        name,
+        grants,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = name {
         __body_map.insert(
@@ -303,6 +331,13 @@ pub fn spaces_key_update(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct SpacesKeyPatchParams {
+    pub access_key: String,
+    pub name: Option<String>,
+    pub grants: Option<Vec<Grant>>,
+}
+
 /// To update Spaces Access Key, send a PUT or PATCH request to `/v2/spaces/keys/$ACCESS_KEY`. At the moment, you cannot convert a fullaccess key to a scoped key or vice versa. You can only update the name of the key.
 ///
 /// # Arguments
@@ -312,11 +347,14 @@ pub fn spaces_key_update(
 /// * `grants` - The list of permissions for the access key.
 pub fn spaces_key_patch(
     config: &ClientConfig,
-    access_key: String,
-    name: Option<String>,
-    grants: Option<Vec<Grant>>,
+    params: SpacesKeyPatchParams,
     options: Option<&RequestOptions>,
 ) -> Result<KeyUpdate, SdkError> {
+    let SpacesKeyPatchParams {
+        access_key,
+        name,
+        grants,
+    } = params;
     let mut __body_map = serde_json::Map::new();
     if let Some(ref value) = name {
         __body_map.insert(

@@ -201,6 +201,13 @@ impl ::std::convert::From<Box<DropletActionSnapshot>> for DropletActionsPostByTa
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct DropletActionsListParams {
+    pub droplet_id: i64,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To retrieve a list of all actions that have been executed for a Droplet, send a GET request to `/v2/droplets/$DROPLET_ID/actions`. The results will be returned as a JSON object with an `actions` key. This will be set to an array filled with `action` objects containing the standard `action` attributes.
 ///
 /// # Arguments
@@ -210,11 +217,14 @@ impl ::std::convert::From<Box<DropletActionSnapshot>> for DropletActionsPostByTa
 /// * `page` - Which 'page' of paginated results to return.
 pub fn droplet_actions_list(
     config: &ClientConfig,
-    droplet_id: i64,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: DropletActionsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllDropletActions, SdkError> {
+    let DropletActionsListParams {
+        droplet_id,
+        per_page,
+        page,
+    } = params;
     validate_range(
         "droplet_id",
         droplet_id as f64,
@@ -278,6 +288,12 @@ pub fn droplet_actions_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct DropletActionsPostParams {
+    pub droplet_id: i64,
+    pub body: Option<DropletActionsPost>,
+}
+
 /// Triggers an action on a specific Droplet, such as rebooting it, changing its size, or creating a snapshot. Supply the action `type` and any additional fields required for that action; restoring a Droplet requires a backup image of that Droplet. A 201 response includes an action object you can use to track the operation.
 ///
 /// To initiate an action on a Droplet send a POST request to `/v2/droplets/$DROPLET_ID/actions`. In the JSON body to the request, set the `type` attribute to one of the supported action types: | Action | Details | Required Permissions | | ---------------------------------------- | ----------- | ----------- | | <nobr\>`enable_backups`</nobr\> | Enables backups for a Droplet | <nobr\>`droplet:update`</nobr\> | | <nobr\>`disable_backups`</nobr\> | Disables backups for a Droplet | <nobr\>`droplet:update`</nobr\> | | <nobr\>`change_backup_policy`</nobr\> | Update the backup policy for a Droplet | <nobr\>`droplet:update`</nobr\> | | <nobr\>`reboot`</nobr\> | Reboots a Droplet. A `reboot` action is an attempt to reboot the Droplet in a graceful way, similar to using the `reboot` command from the console. | <nobr\>`droplet:update`</nobr\> | | <nobr\>`power_cycle`</nobr\> | Power cycles a Droplet. A `powercycle` action is similar to pushing the reset button on a physical machine, it's similar to booting from scratch. | <nobr\>`droplet:update`</nobr\> | | <nobr\>`shutdown`</nobr\> | Shuts down a Droplet. A shutdown action is an attempt to shutdown the Droplet in a graceful way, similar to using the `shutdown` command from the console. Since a `shutdown` command can fail, this action guarantees that the command is issued, not that it succeeds. The preferred way to turn off a Droplet is to attempt a shutdown, with a reasonable timeout, followed by a `power_off` action to ensure the Droplet is off. | <nobr\>`droplet:update`</nobr\> | | <nobr\>`power_off`</nobr\> | Powers off a Droplet. A `power_off` event is a hard shutdown and should only be used if the `shutdown` action is not successful. It is similar to cutting the power on a server and could lead to complications. | <nobr\>`droplet:update`</nobr\> | | <nobr\>`power_on`</nobr\> | Powers on a Droplet. | <nobr\>`droplet:update`</nobr\> | | <nobr\>`restore`</nobr\> | Restore a Droplet using a backup image. The image ID that is passed in must be a backup of the…
@@ -287,10 +303,10 @@ pub fn droplet_actions_list(
 /// * `droplet_id` - A unique identifier for a Droplet instance.
 pub fn droplet_actions_post(
     config: &ClientConfig,
-    droplet_id: i64,
-    body: Option<DropletActionsPost>,
+    params: DropletActionsPostParams,
     options: Option<&RequestOptions>,
 ) -> Result<DropletActionResponse, SdkError> {
+    let DropletActionsPostParams { droplet_id, body } = params;
     validate_range(
         "droplet_id",
         droplet_id as f64,
@@ -332,6 +348,12 @@ pub fn droplet_actions_post(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct DropletActionsPostByTagParams {
+    pub tag_name: Option<String>,
+    pub body: Option<DropletActionsPostByTag>,
+}
+
 /// Triggers a supported action on Droplets that match a tag. Set the action `type` in the request body; bulk actions support power, shutdown, IPv6, backup, and snapshot operations, with IPv6 enablement requiring the Droplet to be powered off. A 201 response includes an action object for each affected Droplet.
 ///
 /// Some actions can be performed in bulk on tagged Droplets. The actions can be initiated by sending a POST to `/v2/droplets/actions?tag_name=$TAG_NAME` with the action arguments. Only a sub-set of action types are supported: \- `power_cycle` \- `power_on` \- `power_off` \- `shutdown` \- `enable_ipv6` (\*\*Warning:\*\* The Droplet must be powered off before enabling IPv6 on an existing Droplet.) \- `enable_backups` \- `disable_backups` \- `snapshot` (also requires `image:create` permission)
@@ -342,10 +364,10 @@ pub fn droplet_actions_post(
 ///   combined with `name` or `type`. Requires `tag:read` scope.
 pub fn droplet_actions_post_by_tag(
     config: &ClientConfig,
-    tag_name: Option<String>,
-    body: Option<DropletActionsPostByTag>,
+    params: DropletActionsPostByTagParams,
     options: Option<&RequestOptions>,
 ) -> Result<DropletActionsResponse, SdkError> {
+    let DropletActionsPostByTagParams { tag_name, body } = params;
     let mut __query: Vec<(&str, String)> = Vec::with_capacity(1);
     if let Some(ref v) = tag_name {
         __query.push(("tag_name", crate::client::query_value(v)));
@@ -380,6 +402,12 @@ pub fn droplet_actions_post_by_tag(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct DropletActionsGetParams {
+    pub droplet_id: i64,
+    pub action_id: i64,
+}
+
 /// To retrieve a Droplet action, send a GET request to `/v2/droplets/$DROPLET_ID/actions/$ACTION_ID`. The response will be a JSON object with a key called `action`. The value will be a Droplet action object.
 ///
 /// # Arguments
@@ -389,10 +417,13 @@ pub fn droplet_actions_post_by_tag(
 ///   reference an action.
 pub fn droplet_actions_get(
     config: &ClientConfig,
-    droplet_id: i64,
-    action_id: i64,
+    params: DropletActionsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<ActionResponse, SdkError> {
+    let DropletActionsGetParams {
+        droplet_id,
+        action_id,
+    } = params;
     validate_range(
         "droplet_id",
         droplet_id as f64,

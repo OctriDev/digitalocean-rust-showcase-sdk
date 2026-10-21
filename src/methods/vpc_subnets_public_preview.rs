@@ -71,6 +71,13 @@ impl std::fmt::Display for VpcSubnetsListMembersEnum {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetsListParams {
+    pub vpc_uuid: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To list all subnets within a VPC, send a GET request to `/v2/vpcs/$VPC_UUID/subnets`.
 ///
 /// # Arguments
@@ -80,11 +87,14 @@ impl std::fmt::Display for VpcSubnetsListMembersEnum {
 /// * `page` - Which 'page' of paginated results to return.
 pub fn vpc_subnets_list(
     config: &ClientConfig,
-    vpc_uuid: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VpcSubnetsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<AllVpcSubnets, SdkError> {
+    let VpcSubnetsListParams {
+        vpc_uuid,
+        per_page,
+        page,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     if let Some(ref per_page_v) = per_page {
         validate_range(
@@ -141,6 +151,13 @@ pub fn vpc_subnets_list(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetsCreateParams {
+    pub vpc_uuid: String,
+    pub name: String,
+    pub ip_range: Option<String>,
+}
+
 /// To create a subnet within a VPC, send a POST request to `/v2/vpcs/$VPC_UUID/subnets` with a name and, optionally, an IP range.
 ///
 /// # Arguments
@@ -151,11 +168,14 @@ pub fn vpc_subnets_list(
 ///   overlap another team or VPC network.
 pub fn vpc_subnets_create(
     config: &ClientConfig,
-    vpc_uuid: String,
-    name: String,
-    ip_range: Option<String>,
+    params: VpcSubnetsCreateParams,
     options: Option<&RequestOptions>,
 ) -> Result<SingleVpcSubnet, SdkError> {
+    let VpcSubnetsCreateParams {
+        vpc_uuid,
+        name,
+        ip_range,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     validate_length(
         "name",
@@ -215,6 +235,12 @@ pub fn vpc_subnets_create(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetsGetParams {
+    pub vpc_uuid: String,
+    pub subnet_uuid: String,
+}
+
 /// To retrieve a specific subnet within a VPC, send a GET request to `/v2/vpcs/$VPC_UUID/subnets/$SUBNET_UUID`.
 ///
 /// # Arguments
@@ -223,10 +249,13 @@ pub fn vpc_subnets_create(
 /// * `subnet_uuid` - The unique identifier of a VPC subnet.
 pub fn vpc_subnets_get(
     config: &ClientConfig,
-    vpc_uuid: String,
-    subnet_uuid: String,
+    params: VpcSubnetsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<SingleVpcSubnet, SdkError> {
+    let VpcSubnetsGetParams {
+        vpc_uuid,
+        subnet_uuid,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     validate_uuid("subnet_uuid", &subnet_uuid)?;
 
@@ -255,6 +284,13 @@ pub fn vpc_subnets_get(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetsUpdateParams {
+    pub vpc_uuid: String,
+    pub subnet_uuid: String,
+    pub name: String,
+}
+
 /// To update the name of a specific subnet within a VPC, send a PATCH request to `/v2/vpcs/$VPC_UUID/subnets/$SUBNET_UUID`.
 ///
 /// # Arguments
@@ -264,11 +300,14 @@ pub fn vpc_subnets_get(
 /// * `name` - The new human-readable name of the VPC subnet.
 pub fn vpc_subnets_update(
     config: &ClientConfig,
-    vpc_uuid: String,
-    subnet_uuid: String,
-    name: String,
+    params: VpcSubnetsUpdateParams,
     options: Option<&RequestOptions>,
 ) -> Result<SingleVpcSubnet, SdkError> {
+    let VpcSubnetsUpdateParams {
+        vpc_uuid,
+        subnet_uuid,
+        name,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     validate_uuid("subnet_uuid", &subnet_uuid)?;
     validate_length(
@@ -319,6 +358,12 @@ pub fn vpc_subnets_update(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VpcSubnetsDeleteParams {
+    pub vpc_uuid: String,
+    pub subnet_uuid: String,
+}
+
 /// To delete a specific subnet from a VPC, send a DELETE request to `/v2/vpcs/$VPC_UUID/subnets/$SUBNET_UUID`. A successful request returns a 204 status code with no response body.
 ///
 /// # Arguments
@@ -327,10 +372,13 @@ pub fn vpc_subnets_update(
 /// * `subnet_uuid` - The unique identifier of a VPC subnet.
 pub fn vpc_subnets_delete(
     config: &ClientConfig,
-    vpc_uuid: String,
-    subnet_uuid: String,
+    params: VpcSubnetsDeleteParams,
     options: Option<&RequestOptions>,
 ) -> Result<serde_json::Value, SdkError> {
+    let VpcSubnetsDeleteParams {
+        vpc_uuid,
+        subnet_uuid,
+    } = params;
     validate_uuid("vpc_uuid", &vpc_uuid)?;
     validate_uuid("subnet_uuid", &subnet_uuid)?;
 

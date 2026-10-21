@@ -110,6 +110,13 @@ impl ::std::convert::From<Box<VolumeActionPostResize>> for VolumeActionsPostById
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct VolumeActionsPostParams {
+    pub body: VolumeActionsPost,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// Triggers an attach or detach action on a block storage volume identified by name. Set `type` to `attach` or `detach` and provide the volume, Droplet, and region details for the action. Use `page` and `per_page` to paginate the results.
 ///
 /// To initiate an action on a block storage volume by Name, send a POST request to `~/v2/volumes/actions`. The body should contain the appropriate attributes for the respective action. ## Attach a Block Storage Volume to a Droplet | Attribute | Details | | ----------- | ------------------------------------------------------------------- | | type | This must be `attach` | | volume_name | The name of the block storage volume | | droplet_id | Set to the Droplet's ID | | region | Set to the slug representing the region where the volume is located | Each volume may only be attached to a single Droplet. However, up to fifteen volumes may be attached to a Droplet at a time. Pre-formatted volumes will be automatically mounted to Ubuntu, Debian, Fedora, Fedora Atomic, and CentOS Droplets created on or after April 26, 2018 when attached. On older Droplets, [additional configuration](https://docs.digitalocean.com/products/volumes/how-to/mount/) is required. ## Remove a Block Storage Volume from a Droplet | Attribute | Details | | ----------- | ------------------------------------------------------------------- | | type | This must be `detach` | | volume_name | The name of the block storage volume | | droplet_id | Set to the Droplet's ID | | region | Set to the slug representing the region where the volume is located |
@@ -120,11 +127,14 @@ impl ::std::convert::From<Box<VolumeActionPostResize>> for VolumeActionsPostById
 /// * `page` - Which 'page' of paginated results to return.
 pub fn volume_actions_post(
     config: &ClientConfig,
-    body: VolumeActionsPost,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VolumeActionsPostParams,
     options: Option<&RequestOptions>,
 ) -> Result<VolumeActionResponse, SdkError> {
+    let VolumeActionsPostParams {
+        body,
+        per_page,
+        page,
+    } = params;
     if let Some(ref per_page_v) = per_page {
         validate_range(
             "per_page",
@@ -185,6 +195,13 @@ pub fn volume_actions_post(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumeActionsListParams {
+    pub volume_id: String,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To retrieve all actions that have been executed on a volume, send a GET request to `/v2/volumes/$VOLUME_ID/actions`.
 ///
 /// # Arguments
@@ -194,11 +211,14 @@ pub fn volume_actions_post(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn volume_actions_list(
     config: &ClientConfig,
-    volume_id: String,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VolumeActionsListParams,
     options: Option<&RequestOptions>,
 ) -> Result<VolumeActions, SdkError> {
+    let VolumeActionsListParams {
+        volume_id,
+        per_page,
+        page,
+    } = params;
     validate_uuid("volume_id", &volume_id)?;
     if let Some(ref per_page_v) = per_page {
         validate_range(
@@ -255,6 +275,14 @@ pub fn volume_actions_list(
     .data)
 }
 
+#[derive(Debug, Clone)]
+pub struct VolumeActionsPostByIdParams {
+    pub volume_id: String,
+    pub body: VolumeActionsPostById,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// Triggers an attach, detach, or resize action on a block storage volume identified by ID. Set `type` to the action to perform and provide the corresponding Droplet or size details, along with the volume's region. Use `page` and `per_page` to paginate the results.
 ///
 /// To initiate an action on a block storage volume by Id, send a POST request to `~/v2/volumes/$VOLUME_ID/actions`. The body should contain the appropriate attributes for the respective action. ## Attach a Block Storage Volume to a Droplet | Attribute | Details | | ---------- | ------------------------------------------------------------------- | | type | This must be `attach` | | droplet_id | Set to the Droplet's ID | | region | Set to the slug representing the region where the volume is located | Each volume may only be attached to a single Droplet. However, up to fifteen volumes may be attached to a Droplet at a time. Pre-formatted volumes will be automatically mounted to Ubuntu, Debian, Fedora, Fedora Atomic, and CentOS Droplets created on or after April 26, 2018 when attached. On older Droplets, [additional configuration](https://docs.digitalocean.com/products/volumes/how-to/mount/) is required. ## Remove a Block Storage Volume from a Droplet | Attribute | Details | | ---------- | ------------------------------------------------------------------- | | type | This must be `detach` | | droplet_id | Set to the Droplet's ID | | region | Set to the slug representing the region where the volume is located | ## Resize a Volume | Attribute | Details | | -------------- | ------------------------------------------------------------------- | | type | This must be `resize` | | size_gigabytes | The new size of the block storage volume in GiB (1024^3) | | region | Set to the slug representing the region where the volume is located | Volumes may only be resized upwards. The maximum size for a volume is 16TiB.
@@ -266,12 +294,15 @@ pub fn volume_actions_list(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn volume_actions_post_by_id(
     config: &ClientConfig,
-    volume_id: String,
-    body: VolumeActionsPostById,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VolumeActionsPostByIdParams,
     options: Option<&RequestOptions>,
 ) -> Result<VolumeActionResponse, SdkError> {
+    let VolumeActionsPostByIdParams {
+        volume_id,
+        body,
+        per_page,
+        page,
+    } = params;
     validate_uuid("volume_id", &volume_id)?;
     if let Some(ref per_page_v) = per_page {
         validate_range(
@@ -336,6 +367,14 @@ pub fn volume_actions_post_by_id(
     .data)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct VolumeActionsGetParams {
+    pub volume_id: String,
+    pub action_id: i64,
+    pub per_page: Option<i64>,
+    pub page: Option<i64>,
+}
+
 /// To retrieve the status of a volume action, send a GET request to `/v2/volumes/$VOLUME_ID/actions/$ACTION_ID`.
 ///
 /// # Arguments
@@ -347,12 +386,15 @@ pub fn volume_actions_post_by_id(
 /// * `page` - Which 'page' of paginated results to return.
 pub fn volume_actions_get(
     config: &ClientConfig,
-    volume_id: String,
-    action_id: i64,
-    per_page: Option<i64>,
-    page: Option<i64>,
+    params: VolumeActionsGetParams,
     options: Option<&RequestOptions>,
 ) -> Result<VolumeActionResponse, SdkError> {
+    let VolumeActionsGetParams {
+        volume_id,
+        action_id,
+        per_page,
+        page,
+    } = params;
     validate_uuid("volume_id", &volume_id)?;
     validate_range(
         "action_id",
